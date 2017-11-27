@@ -35,6 +35,7 @@ get_fifth()
 get_chord_tones()
 get_tensions()
 get_clashing()
+get_scale()
 invert(steps, up=True)
 transpose(steps, up=True)
 ```
@@ -87,3 +88,7 @@ This makes most sense with Idea 4.
 We could have 3 phases of learning, which builds the solo in the same way one would build a house: start with the foundation, add important supporting features, then fill in the details. This would enable us to leverage different musical ideas, and separate them logically. More specifically, we could apply different evalutation functions to each phase: enforce different phrase lengths, and varied contours in phase 3, enforce different kinds of embellishment in phase 2, and choose accurate, tonal notes for phase 1.
 
 This is a very interesting theoretical approach. Since we are simulating improvisation, it may not make sense to think in these grand terms. At the same time, the best solos evolve to be coherent when viewed through any lens. This approach blurs the distinction between improvisation and composition.
+
+## Output to MIDI?
+
+Should be pretty simple using [this](https://pypi.python.org/pypi/MIDIUtil/) python midi library.
