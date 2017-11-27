@@ -78,7 +78,11 @@ Since there will certainly be some kind of underlying probabilistic model, we wi
 
 #### Idea 1
 
+words
+
 #### Idea 2
+
+words
 
 #### Idea 3
 
@@ -89,6 +93,10 @@ We could have 3 phases of learning, which builds the solo in the same way one wo
 
 This is a very interesting theoretical approach. Since we are simulating improvisation, it may not make sense to think in these grand terms. At the same time, the best solos evolve to be coherent when viewed through any lens. This approach blurs the distinction between improvisation and composition.
 
+## Putting it all Together: Algorithms
+
+RL Markov music math stuff
+
 ## Output to MIDI?
 
-Should be pretty simple using [this](https://pypi.python.org/pypi/MIDIUtil/) python midi library.
+Should be pretty simple using [this](https://pypi.python.org/pypi/MIDIUtil/) python midi library. Look at [this guy's code](https://github.com/ckdotca/JSB2/blob/master/JSB2.py) for inspiration on how to use this library to generate chords and melodies.

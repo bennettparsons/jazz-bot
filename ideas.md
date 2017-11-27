@@ -10,7 +10,11 @@ To accomplish this, we have to create models that enforce --- or simply encourag
 
 Assuming we have some success with the above, we could imagine tweaking those elements, and introducing some others to try and match different styles, or even come up with our own! For instance, we could pull back on tonality and coherency to try and emulate free jazz, or introduce a new element that determines how sparse the improvisation is, maybe to try and capture the feel of a ballad.
 
-### Cool Idea: Center Around a Lick
+### Melodic Motives: Center Around a Lick
 What would be really neat is if we could input a small lick and have it produces variations on it. We could set up a pretty straight forward model for this capable of performing the following operations on the lick: repitition, ornamentation, inversion, extension, transposition, embellishment, etc. This is particularly useful, because most improvisations do this to the melody anyway!
 
 If we find that generated solos not using this idea turn out to be uncompelling, we could try to infuse a random generation of a particular lick which the solo could be based off of. This could even be a means toward composition of an entire piece.
+
+### Rhythmic Motives: Repeat a Cool Rhythm
+
+Much like the above, except use rhythm more intentionally. Basically generate, either by input or random generator, a short rhythmic motive, then make this rhythm more likely to be selected by the bot as it generates the solo.
