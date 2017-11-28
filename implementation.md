@@ -4,12 +4,10 @@
 
 Attributes:
 
-* Letter name
-* Octave
-* Absolute pitch (see below)
+* Midi Pitch Value
 * Duration (rhythmic value)
 
-It might also be useful to map (letter name, octave) pairs to integers denoting absolute pitch, as it's probably easier to work with just integers.
+Note that we can easily convert between Midi pitch numbers and note letter name / octave pairs.
 
 Member Functions:
 
@@ -89,13 +87,15 @@ words
 This makes most sense with Idea 4.
 
 #### Idea 4
-We could have 3 phases of learning, which builds the solo in the same way one would build a house: start with the foundation, add important supporting features, then fill in the details. This would enable us to leverage different musical ideas, and separate them logically. More specifically, we could apply different evalutation functions to each phase: enforce different phrase lengths, and varied contours in phase 3, enforce different kinds of embellishment in phase 2, and choose accurate, tonal notes for phase 1.
+We could have 3 phases of learning, which builds the solo in the same way one would build a house: start with the foundation, add important supporting features, then fill in the details. This would enable us to leverage different musical ideas, and separate them logically. More specifically, we could apply different evalutation functions to each phase: enforce different phrase lengths, and varied contours in phase 3, enforce different kinds of embellishment in phase 2, and choose accurate, tonal notes for phase 1. Thus, we discretize the solo into logical, musical chunks, and compose one chunk at a time given a set of requirements. For instance, one phase will have to decide how to write a particular phrase given the set phrase length, cadence type, and contour dictated by the previous phase, and the last phase will have to select the appropriate approach tones to get from one chord tone to the next.
 
 This is a very interesting theoretical approach. Since we are simulating improvisation, it may not make sense to think in these grand terms. At the same time, the best solos evolve to be coherent when viewed through any lens. This approach blurs the distinction between improvisation and composition.
 
 ## Putting it all Together: Algorithms
 
-RL Markov music math stuff
+THIS IS THE IMPORTANT PART!!!
+
+After thinking about this more, I think we need to make a decision between using markov/MDPs or RL. Basically the question is this: should we try to build the model ourselves by just thinking about music theory (ie assign probabilities and rewards to transitions -- there will be a lot of these though) or should we try to learn these from scratch using smart evaluation functions that will return an appropriate reward for a given transition. Might actually help if we discretize the space hierarchically using something like [Idea 4](Idea-4).
 
 ## Output to MIDI?
 

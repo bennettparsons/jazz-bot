@@ -56,5 +56,5 @@ for chord in chords:
     i += 4
 
 # write a midi file
-with open("major-scale-chords.mid", "wb") as output_file:
+with open("blues-changes.mid", "wb") as output_file:
     MyMIDI.writeFile(output_file)
