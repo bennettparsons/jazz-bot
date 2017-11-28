@@ -95,7 +95,17 @@ This is a very interesting theoretical approach. Since we are simulating improvi
 
 THIS IS THE IMPORTANT PART!!!
 
-After thinking about this more, I think we need to make a decision between using markov/MDPs or RL. Basically the question is this: should we try to build the model ourselves by just thinking about music theory (ie assign probabilities and rewards to transitions -- there will be a lot of these though) or should we try to learn these from scratch using smart evaluation functions that will return an appropriate reward for a given transition. Might actually help if we discretize the space hierarchically using something like [Idea 4](Idea-4).
+### initial thoughts
+
+After thinking about this more, I think we need to make a decision between using markov/MDPs or RL. Basically the question is this: should we try to build the model ourselves by just thinking about music theory (ie assign probabilities and rewards to transitions -- there will be a lot of these though) or should we try to learn these from scratch using smart evaluation functions that will return an appropriate reward for a given transition. Might actually help if we discretize the space hierarchically using something like [Idea 4](#idea-4).
+
+### combination of above in hierarchal approach
+
+I worry that using straight RL will not give our bot enough variation. RL is an optimization technique, which tries to compute the optimal policy. There is no optimal policy in music. So we could apply RL to only certain layers in the hierchal approach. That is, when we do the first layer which just maps out the structure and important goal tones of the solo, we could just use some simple, sufficiently random markov model we come up with ourselves. Then, given this data, we could use RL to smartly build phrases subject to these given parameters.
+
+### but what's the SIMPLEST approach we can start with?
+
+...
 
 ## Output to MIDI?
 
