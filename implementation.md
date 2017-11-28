@@ -105,8 +105,18 @@ I worry that using straight RL will not give our bot enough variation. RL is an 
 
 ### but what's the SIMPLEST approach we can start with?
 
-...
+#### A string of eighth notes
+
+Fix rhythm: only produce eighth notes, no rests. Write a continuous melody that seeks to maintain the following attributes (or equivalently, minimize penalties): 1) plays chord tones 2) roughly scalar (not large intervallic leaps) 3) smooth contour (rising and falling)
+
+Step 1: do this anyway we can!
+
+Step 2: do this in a way that can scale to using any number of selective heuristics
+
+Step 3: if not done by now, try to frame this as an RL/MDP problem
 
 ## Output to MIDI?
 
 Should be pretty simple using [this](https://pypi.python.org/pypi/MIDIUtil/) python midi library. Look at [this guy's code](https://github.com/ckdotca/JSB2/blob/master/JSB2.py) for inspiration on how to use this library to generate chords and melodies.
+
+UPDATE: it's definitely easy (see `midi_test.py`)
