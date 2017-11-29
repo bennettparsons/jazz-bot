@@ -41,7 +41,7 @@ transpose(steps, up=True)
 
 ## What is a State?
 
-Since there will certainly be some kind of underlying probabilistic model, we will need some notion of a ``state''. This is also a requisite for general RL. Below are some possible representations of state:
+Since there will certainly be some kind of underlying probabilistic model, we will need some notion of a "state". This is also a requisite for general RL. Below are some possible representations of state:
 
 1. Simplest
 	* Chord + Note
@@ -105,15 +105,49 @@ I worry that using straight RL will not give our bot enough variation. RL is an 
 
 ### but what's the SIMPLEST approach we can start with?
 
-#### A string of eighth notes
+Let's first solve the following simple subproblem: compose a melody over one measure (one chord). Use just eighth notes, no rests. Write a continuous melody that seeks to maintain the following attributes (or equivalently, minimize penalties): 1) plays chord tones 2) roughly scalar (not large intervallic leaps) 3) smooth contour (rising and falling). But how?
 
-Fix rhythm: only produce eighth notes, no rests. Write a continuous melody that seeks to maintain the following attributes (or equivalently, minimize penalties): 1) plays chord tones 2) roughly scalar (not large intervallic leaps) 3) smooth contour (rising and falling)
+#### Straight up Qlearning
 
-Step 1: do this anyway we can!
+Model off Berekely pacman qlearning setup, and try to write smart reward functions. A state is just a single eighth note. Use dynamic programming.
 
-Step 2: do this in a way that can scale to using any number of selective heuristics
+* Reward functions take in only current state and next state
 
-Step 3: if not done by now, try to frame this as an RL/MDP problem
+#### Probabilistic: build as we go
+
+Somehow easier solution (smaller complexity). Choose start state (may be fixed by hierarchy/Black Box). Using reward functions, calculate soft max policy for next states to transition to. Sample from this distribution. Repeat, except at each step, leverage entire past. Once we reach the end of the measure, just return what we have.
+
+* Reward functions take in current state and entire past
+
+##### Advantages (vs. RL)
+
+* can condition on entire past
+* faster
+* more probabilistic - higher variance
+
+##### Disadvantages
+
+* not "complete"; doesn't find optimal solution according to our reward functions
+* this actually might be good though, since we know we cannot perfectly capture the notion of "good" music with our handmade rewards
+
+#### Local Search
+
+Use the solution return by the probabilistic approach as the input to a local search problem. Engineer smart neighbor function. Can use straight hill climbing, beam search or simulated annealing. Could even imagine applying a genetic algorithm with a smart cross-over function
+
+* reward functions act on entire realization of melody (for the measure)
+
+##### Advantages (vs. probabilitic)
+
+* pretty much strictly better, since it starts with that solution
+* the real win is that it is more natural to define reward functions that act on entire realization of a melody. Two notes don't really mean anything by themselves. But with 8 whole eighth notes, you can start to extract some more meaningful musical qualities.
+
+## Feature Evaluation Functions
+
+Here we discuss ways to implement some of the feature functions we allude to in `ideas.md`. One simple way of aggregating feature functions would be to carry around a weighting of states
+
+### Tonality
+
+On the simplest blues form, we just use dominant chords. Check out [this](https://www.jazzadvice.com/v7-to-i-10-options-for-expanding-your-dominant-7th-vocabulary/) site for ideas on how to weight specific 
 
 ## Output to MIDI?
 
