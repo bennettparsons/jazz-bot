@@ -2,7 +2,23 @@
 Definitions of note, chord and ... objects
 """
 
-import util
+class MusicTheory:
+	"""
+	A static class containting structures defining Roman Numeral
+	chords, chord qualities, and key areas associated with their
+	respective MIDI pitch values
+	"""
+	keys = {'A':45, 'Bb':46, 'B':47, 'C':48, 'Db':49, 'D':50,
+	 		'Eb':51, 'E':52, 'F':53, 'Gb':54, 'G':55, 'Ab':56}
+
+	numerals = {'I':0, 'bII':1, 'II':2, 'III':4, 'IV':5, 'bV':6,
+				'V':7, 'bVI':8, 'VI': 9, 'bVII':10, 'VII': 11}
+
+	qualities = {'M': [0,4,7], 'm': [0,3,7], 'M7': [0,4,7,11], 
+			'm7': [0,3,7,10], '7': [0,4,7,10]}
+
+	pitches = ['C', 'Db', 'D', 'Eb', 'E', 'F',
+			   'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
 
 
 class Note:
@@ -37,25 +53,15 @@ class Chord:
 	def __str__ (self):
 		s = ""
 		for note in self.notes:
-			s += get_pitch_letter(note.pitch)
-		s += ": " + self.duration
+			# get letter name of constituent pitches
+			s += MusicTheory.pitches[note.pitch%12] + " "
+		s += ": " + str(self.duration)
+		return s
 
 	# other stuff...
 
-class MusicTheory:
-	"""
-	A static class containting structures defining Roman Numeral
-	chords, chord qualities, and key areas associated with their
-	respective MIDI pitch values
-	"""
-	keys = {'A':45, 'Bb':46, 'B':47, 'C':48, 'Db':49, 'D':50,
-	 		'Eb':51, 'E':52, 'F':53, 'Gb':54, 'G':55, 'Ab':56}
 
-	numerals = {'I': 0, 'II': 1, 'III': 2, 'IV': 3, 
-				'V': 4, 'VI': 5, 'VII': 6}
+if __name__ == "__main__":
+	# unit tests
+	pass
 
-	qualities = {'M': [0,4,7], 'm': [0,3,7], 'M7': [0,4,7,11], 
-			'm7': [0,3,7,10], '7': [0,4,7,10]}
-
-	pitches = ['C', 'Db', 'D', 'Eb', 'E', 'F',
-			   'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
