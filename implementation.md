@@ -109,7 +109,7 @@ Let's first solve the following simple subproblem: compose a melody over one mea
 
 #### Straight up Qlearning
 
-Model off Berekely pacman qlearning setup, and try to write smart reward functions. A state is just a single eighth note. Use dynamic programming.
+Model off Berekely pacman qlearning setup, and try to write smart reward functions. A state is just a single eighth note. Use dynamic programming. Make sure to use a "soft max" when extracting a policy from qvals so that we end up mapping states to a distribution of actions, rather than a single action.
 
 * Reward functions take in only current state and next state
 
