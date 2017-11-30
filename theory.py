@@ -1,6 +1,9 @@
 """
 Definitions of note, chord and ... objects
 """
+std_volume = 100
+std_note_dur = 1
+std_chord_dur = 4
 
 class MusicTheory:
 	"""
@@ -26,9 +29,11 @@ class Note:
 	A Note consists of midi pitch value and a duration
 	"""
 
-	def __init__ (self, pitch, duration):
+	def __init__ (self, pitch, duration=std_note_dur, volume=std_volume):
+		assert(pitch >= 0 and pitch <= 127)
 		self.pitch = pitch
 		self.duration = duration
+		self.volume = std_volume
 
 	def set_duration(duration):
 		self.duration = duration
@@ -39,6 +44,9 @@ class Note:
 		else:
 			self.pitch -= steps
 
+	def __str__ (self):
+		return MusicTheory.pitches[self.pitch%12] + ": " + str(self.duration)
+
 
 
 class Chord:
@@ -46,9 +54,10 @@ class Chord:
 	A Chord consists of a bunch of notes, and a quality
 	"""
 
-	def __init__ (self, notes, duration):
+	def __init__ (self, notes, duration=std_chord_dur, volume=std_volume):
 		self.notes = notes
 		self.duration = duration
+		self.volume = std_volume
 
 	def __str__ (self):
 		s = ""
