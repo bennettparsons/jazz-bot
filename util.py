@@ -1,5 +1,16 @@
+# jazz-bot: util.py
+
 from theory import MusicTheory, Note, Chord
 from midiutil import MIDIFile
+
+
+letter_names = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
+
+def as_letter(pitch):
+	return letter_names[pitch%12]
+
+def as_letters(notes):
+	return [as_letter(n.pitch) for n in notes]
 
 def build_chord(key, numeral, quality, duration=4):
 	"""
@@ -8,7 +19,7 @@ def build_chord(key, numeral, quality, duration=4):
 	key_offset = MusicTheory.keys[key]
 	numeral_offset = MusicTheory.numerals[numeral]
 	pitches = [p+key_offset+numeral_offset for p in MusicTheory.qualities[quality]]
-	return Chord([Note(p, duration=duration) for p in pitches], duration=duration)
+	return Chord([Note(p, duration=duration) for p in pitches], numeral=numeral, quality=quality, duration=duration)
 
 def build_progression(key, numerals, duration=4):
 	"""

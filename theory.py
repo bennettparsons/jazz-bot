@@ -1,6 +1,5 @@
-"""
-Definitions of note, chord and ... objects
-"""
+# jazz-bot: theory.py
+
 std_volume = 100
 std_note_dur = 1
 std_chord_dur = 4
@@ -11,6 +10,7 @@ class MusicTheory:
 	chords, chord qualities, and key areas associated with their
 	respective MIDI pitch values
 	"""
+
 	keys = {'A':45, 'Bb':46, 'B':47, 'C':48, 'Db':49, 'D':50,
 	 		'Eb':51, 'E':52, 'F':53, 'Gb':54, 'G':55, 'Ab':56}
 
@@ -20,7 +20,7 @@ class MusicTheory:
 	qualities = {'M': [0,4,7], 'm': [0,3,7], 'M7': [0,4,7,11], 
 			'm7': [0,3,7,10], '7': [0,4,7,10]}
 
-	pitches = ['C', 'Db', 'D', 'Eb', 'E', 'F',
+	pitches = ['C', 'Db', 'D', 'Eb', 'E', 'F', 
 			   'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
 
 
@@ -54,7 +54,7 @@ class Chord:
 	A Chord consists of a bunch of notes, and a quality
 	"""
 
-	def __init__ (self, notes, duration=std_chord_dur, volume=std_volume):
+	def __init__ (self, notes, numeral=None, quality=None, duration=std_chord_dur, volume=std_volume):
 		self.notes = notes
 		self.duration = duration
 		self.volume = std_volume
