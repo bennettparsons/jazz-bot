@@ -36,7 +36,6 @@ def write_midi_chords(midi, track, chords, channel):
 		t += note.duration
 	return midi
 
-
 def write_midi(solo=None, chords=None, outfile="jazzy-bot-solo.mid", channel=0, tempo=132):
 	"""
 	write a midi file based on solo, a list of Note objects, and chords, a
@@ -57,7 +56,7 @@ def write_midi(solo=None, chords=None, outfile="jazzy-bot-solo.mid", channel=0, 
 			write_midi_chords(midi, 0, chords, channel)
 	with open(outfile, "wb") as f:
 		midi.writeFile(f)
-	
+
 
 if __name__ == "__main__":
 	print Note(48)

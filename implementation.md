@@ -127,6 +127,7 @@ Somehow easier solution (smaller complexity). Choose start state (may be fixed b
 
 ##### Disadvantages
 
+* can't improvise in real time; the biggest advantage of RL is that once it learns the model, it could conceivably improvise in really time, just by sampling from the learned, probabilistic policy function
 * not "complete"; doesn't find optimal solution according to our reward functions
 * this actually might be good though, since we know we cannot perfectly capture the notion of "good" music with our handmade rewards
 
