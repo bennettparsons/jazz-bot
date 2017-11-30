@@ -4,14 +4,6 @@ from theory import MusicTheory, Note, Chord
 from midiutil import MIDIFile
 
 
-letter_names = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
-
-def as_letter(pitch):
-	return letter_names[pitch%12]
-
-def as_letters(notes):
-	return [as_letter(n.pitch) for n in notes]
-
 def build_chord(key, numeral, quality, duration=4):
 	"""
 	constructs a Chord object given a key, numeral, quality and duration
@@ -19,7 +11,7 @@ def build_chord(key, numeral, quality, duration=4):
 	key_offset = MusicTheory.keys[key]
 	numeral_offset = MusicTheory.numerals[numeral]
 	pitches = [p+key_offset+numeral_offset for p in MusicTheory.qualities[quality]]
-	return Chord([Note(p, duration=duration) for p in pitches], numeral=numeral, quality=quality, duration=duration)
+	return Chord([Note(p, duration=duration) for p in pitches], key=key, numeral=numeral, quality=quality, duration=duration)
 
 def build_progression(key, numerals, duration=4):
 	"""
@@ -31,7 +23,7 @@ def build_progression(key, numerals, duration=4):
 def write_midi_solo(midi, track, solo, channel):
 	t = 0
 	for note in solo:
-		midi.addNote(track, channel, note.pitch, t, note.duration, note.volume)
+		midi.addNote(track, channel, note.as_pitch(), t, note.duration, note.volume)
 		t += note.duration
 	return midi
 
@@ -40,7 +32,7 @@ def write_midi_chords(midi, track, chords, channel):
 	t = 0
 	for chord in chords:
 		for note in chord.notes:
-			midi.addNote(track, channel, note.pitch, t, note.duration, note.volume)
+			midi.addNote(track, channel, note.as_pitch(), t, note.duration, note.volume)
 		t += note.duration
 	return midi
 
