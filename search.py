@@ -32,7 +32,7 @@ class search_solver(subproblem):
 
 
 	################################
-	# 		Local search 		   #
+	#     Simulated annealing      #
 	################################
 
 	def search(self):
@@ -40,9 +40,11 @@ class search_solver(subproblem):
 			implements a simple search algorithm: hill-climbing with metropolis variation
 
 			soln is a list of Note objects
+
+			TO DO - add a scheduling / temperature function
 		"""
 		# initialize
-		curr_soln = util.make_notes([self.chord.get_root().get_pitch()] * 8) # TBU
+		curr_soln = util.make_notes([self.chord.get_root().get_pitch()+24] * 8) # TBU
 
 		n = 100
 		climbed = 1 # flag if an iteration changes, so don't have to recompute the evaluation
@@ -91,6 +93,90 @@ class search_solver(subproblem):
 		proposed_soln[i] = util.make_notes([proposed_pitch])[0] # ew
 		return proposed_soln
 
+	################################
+	# 		Genetic algorithms 	   #
+	################################
+
+	def GA(self):
+		"""
+			a GA approach could be interesting b/c crossovers may 1. combine interesting licks / patterns
+			and 2. create interesting intervallic jumps / dives
+		"""
+		# globals
+		generation_sz = 10
+		generations = 1000
+
+		# intialize initial population
+		population = self.generate_population(generation_sz)
+
+		# repeat until an individual is uber fit (or sufficient time...)
+		for _ in range(generations):
+
+			successor_population = []
+			# replace population with successor population
+			for _ in range(generation_sz):
+
+				# selection time
+				# 	sample parents with probability that's proportional to fitness
+				fitness = [self.get_fitness(individual) for individual in population]
+				normalized_fitness = map(lambda x: x / float(sum(fitness)), fitness)
+
+				# np.random allows specifying a distribution, but works on 1-d array only, hence indexing
+				mom = population[np.random.choice(range(len(population)), p=normalized_fitness)]
+				dad = population[np.random.choice(range(len(population)), p=normalized_fitness)]
+
+				# sexy time (crossover)
+				child = self.reproduce(mom, dad)
+
+				# mutate
+				# 	note should be randomly changed with some small probability
+				mutated_child = self.mutate(child)
+
+				successor_population.append(mutated_child)
+
+			population = successor_population
+
+		# return the fittest individual
+		return sorted(population, key=lambda individual: self.get_fitness(individual), reverse=True)[0]
+
+	def generate_individual_for_population(self):
+		"""
+			list of Notes
+		"""
+		pitch_sd = 3 # \sigma = 3 1/2 steps
+		pitches = [self.chord.get_root().get_pitch()+24] * 8
+		pitches = map(lambda pitch: int(random.gauss(pitch, pitch_sd)), pitches)
+		return util.make_notes(pitches)
+
+	def generate_population(self, sz):
+		"""
+			list of list of Notes
+		"""
+
+		return [self.generate_individual_for_population() for _ in range(sz)]
+
+	def get_fitness(self, individual):
+		return self.ensemble_evaluate(individual)
+
+	def reproduce(self, mom, dad):
+		"""
+			chose to retain only one child
+		"""
+		# pick crossover point
+		i = random.choice(range(len(mom)))
+		return mom[:i] + dad[i:]
+
+	def mutate(self, child):
+		"""
+		 	should add a temperature function here also
+		"""
+		mutated_child = copy.copy(child)
+		for note_index, note in enumerate(mutated_child):
+			if random.random() < 0.05:
+				pitch = note.get_pitch()
+				new_pitch = int(random.gauss(pitch, 3))  # \sigma = 3 1/2 steps, again
+				mutated_child[note_index] = util.make_notes([new_pitch])[0]
+		return mutated_child
 
 	################################
     # Feature Evaluation Functions #
@@ -98,7 +184,7 @@ class search_solver(subproblem):
 
 	def ensemble_evaluate(self, soln):
 		"""
-			for now, relying only on tonality
+			simply additive for the time being
 		"""
 
 		return self.tonality(soln) + self.contour(soln)
@@ -198,4 +284,4 @@ if __name__ == "__main__":
 	C7 = util.build_chord('C', 'I', 'M7')
 	P1 = search_solver(G7)
 	P2 = search_solver(C7)
-	util.write_midi(solo=P1.search() + P2.search(), chords=[P1.chord, P2.chord])
+	util.write_midi(solo=P1.GA() + P2.GA(), chords=[P1.chord, P2.chord])
