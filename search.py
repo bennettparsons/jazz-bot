@@ -111,7 +111,7 @@ class search_solver:
 
 	def ensemble_evaluate(self, soln):
 		"""
-			for now, relying only on tonality
+		evaluate on tonality, contour and register
 		"""
 
 		return self.tonality(soln) + self.contour(soln) + self.register(soln)
@@ -159,7 +159,8 @@ class search_solver:
 		# heuristics
 		interval_variety = {1:0, 2:0, 3:1, 4:3, 5:3, 6:2, 7:1, 8:1}
 		direction_variety = {1:0, 2:2, 3:3, 4:3, 5:2, 6:1, 7:1, 8:1}
-		interval_weights = [.5, .4, .3, .3, .3, .2, .2, .1]
+		# interval_weights = [.5, .4, .3, .3, .3, .2, .2, .1]
+		interval_weights = [1, .8, .6, .5, .3, .2, .2, .1]
 
 		sol = util.make_pitches(solution)
 		up = "up"
