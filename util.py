@@ -1,16 +1,23 @@
 # jazz-bot: util.py
 
-from theory import MusicTheory, Note, Chord
+from structures import Note, Chord
+import theory
 from midiutil import MIDIFile
 
+
+def make_notes(pitches, duration=.5):
+	"""
+	convert a list of pitches to a list of note objects
+	"""
+	return [Note(p) for p in pitches]
 
 def build_chord(key, numeral, quality, duration=4):
 	"""
 	constructs a Chord object given a key, numeral, quality and duration
 	"""
-	key_offset = MusicTheory.keys[key]
-	numeral_offset = MusicTheory.numerals[numeral]
-	pitches = [p+key_offset+numeral_offset for p in MusicTheory.qualities[quality]]
+	key_offset = theory.keys[key]
+	numeral_offset = theory.numerals[numeral]
+	pitches = [p+key_offset+numeral_offset for p in theory.qualities[quality]]
 	return Chord([Note(p, duration=duration) for p in pitches], key=key, numeral=numeral, quality=quality, duration=duration)
 
 def build_progression(key, numerals, duration=4):

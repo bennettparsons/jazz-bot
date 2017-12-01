@@ -1,6 +1,7 @@
 # jazz-bot: search.py
 
 import util
+from problems import subproblem
 
 class search_solver(subproblem):
 	"""
@@ -29,7 +30,24 @@ class search_solver(subproblem):
 		tones as a feature of subproblem, retrievable with a call to
 		get_important_notes()
 		"""
-		pass
+		score = 0
+		tension = None
+		for note in self.solution:
+			if tension and self.chord.is_tension_resolution(tension, note.as_letter()):
+				score += 5
+			tension = None
+			letter = note.as_letter()
+			if self.chord.is_third_or_seventh(letter):
+				score += 3
+			elif self.chord.is_chord_tone(letter):
+				score += 2
+			elif self.chord.is_in_scale(letter):
+				score += 1
+			elif self.chord.is_tension(letter):
+				tension = letter
+		return score
+
+
 
 
 	def contour(self):
@@ -41,3 +59,11 @@ class search_solver(subproblem):
 		intervalls larger than octaves, and "too many" consecutive large 
 		(third or larger) intervalls
 		"""
+		pass
+
+
+
+if __name__ == "__main__":
+	G7 = util.build_chord('G', 'I', '7')
+	P = search_solver(G7)
+	print P.chord.get_chord_tones()
