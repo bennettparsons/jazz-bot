@@ -9,6 +9,9 @@ class search_solver(subproblem):
 	subproblem, and solves the problem using local search
 	"""
 
+	def __init__(self, chord):
+		self.chord = chord
+		self.solution = self.get_solution()
 
 	def get_solution(self):
 		"""
@@ -16,7 +19,13 @@ class search_solver(subproblem):
 		requirements of the subproblem and can be subjected to 
 		the feature evaluation functions
 		"""
-		pass
+		return self.get_sample_G7_solution1()
+
+	def get_sample_G7_solution1(self):
+		return util.make_notes([86, 84, 81, 82, 83, 81, 79, 78, 77])
+
+	def get_sample_G7_solution2(self):
+		return util.make_notes([77, 81, 76, 79, 77, 69, 72, 74])
 
 	################################
     # Feature Evaluation Functions #
@@ -33,7 +42,7 @@ class search_solver(subproblem):
 		score = 0
 		tension = None
 		for note in self.solution:
-			if tension and self.chord.is_tension_resolution(tension, note.as_letter()):
+			if tension and self.chord.is_tension_resolution((tension, note.as_letter())):
 				score += 5
 			tension = None
 			letter = note.as_letter()
@@ -66,4 +75,6 @@ class search_solver(subproblem):
 if __name__ == "__main__":
 	G7 = util.build_chord('G', 'I', '7')
 	P = search_solver(G7)
-	print P.chord.get_chord_tones()
+	print P.tonality()
+	# print P.chord.get_chord_tones()
+	# util.write_midi(solo=P.get_sample_G7_solution(), chords=[P.chord])

@@ -9,7 +9,7 @@ def make_notes(pitches, duration=.5):
 	"""
 	convert a list of pitches to a list of note objects
 	"""
-	return [Note(p) for p in pitches]
+	return [Note(p, duration=duration) for p in pitches]
 
 def build_chord(key, numeral, quality, duration=4):
 	"""
