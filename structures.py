@@ -39,7 +39,8 @@ class Note:
 	def __str__ (self):
 		return self.as_letter() + ": " + str(self.duration)
 
-
+	def get_pitch(self):
+		return self.pitch
 
 class Chord:
 	"""
