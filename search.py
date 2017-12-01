@@ -1,5 +1,6 @@
 # jazz-bot: search.py
 
+import random, copy
 import util
 from problems import subproblem
 
@@ -22,14 +23,80 @@ class search_solver(subproblem):
 		return self.get_sample_G7_solution1()
 
 	def get_sample_G7_solution1(self):
-		return util.make_notes([86, 84, 81, 82, 83, 81, 79, 78, 77])
+		return util.make_notes([86, 84, 81, 82, 83, 81, 79, 78])
 
 	def get_sample_G7_solution2(self):
 		return util.make_notes([77, 81, 76, 79, 77, 69, 72, 74])
 
+
+
+	################################
+	# 		Local search 		   #
+	################################
+
+	def search(self):
+		"""
+			implements a simple search algorithm: hill-climbing with metropolis variation
+
+			soln is a list of Note objects
+		"""
+		# initialize
+		curr_soln = [self.chord.get_root()] * 8 # TBU
+
+		n = 1000
+		climbed = 1 # flag if an iteration changes, so don't have to recompute the evaluation
+		curr_soln_val = 0
+
+		for _ in range(n):
+
+			if climbed:
+				curr_soln_val = self.ensemble_evaluate(curr_soln)
+			climbed = 0
+
+			# get neighbor node
+			candidate_soln = self.get_neighbor_node(curr_soln)
+
+			# accept with probability 1 if climbs up
+			if self.ensemble_evaluate(candidate_soln) > curr_soln_val:
+				curr_soln = candidate_soln
+				climbed = 1
+				continue
+
+			# accept with probability <1 if climbs down
+			# sh/ould be proportional to size of change but not sure what distance metric makes sense rn
+			if random.random() < 0.1:
+				curr_soln = candidate_soln
+				climbed = 1
+
+		return curr_soln
+
+
+	def get_neighbor_node(self, soln, pitch_sd=3):
+		"""
+			implements a naive approach for retrieving neighbors
+
+			1 s.d. corresponds to 3 half-steps ? we can tweak however
+		"""
+
+		# sample a single note
+		i = random.choice(range(len(soln)))
+
+		# sample notes to replace this note
+		pitch = soln[i].get_pitch()
+		proposed_pitch = int(random.gauss(pitch, pitch_sd))
+
+		# python is pass by ref right?
+		proposed_soln = soln.copy()
+		proposed_soln[i] = proposed_pitch
+		return proposed_soln
+
+
 	################################
     # Feature Evaluation Functions #
     ################################
+
+	def ensemble_evaluate(self):
+		pass
 
 	def tonality(self):
 		"""
