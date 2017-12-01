@@ -24,3 +24,17 @@ scales = {
 		  'm7': [], 
 		  '7': [0,2,4,5,7,9,10,11]   # bebop scale
 		 }
+
+# useful intervals
+second = [1,2]
+third = [3,4]
+fourth = [5]
+tritone = [6]
+fifth = [7]
+sixth = [8,9]
+sevneth = [10,11]
+
+large_leap = [n+5 for n in range(50)]
+
+# play notes from this range for solo
+register = [n+54 for n in range(36)]
