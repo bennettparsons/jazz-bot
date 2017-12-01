@@ -41,9 +41,9 @@ class search_solver(subproblem):
 			soln is a list of Note objects
 		"""
 		# initialize
-		curr_soln = [self.chord.get_root()] * 8 # TBU
+		curr_soln = util.make_notes([self.chord.get_root().get_pitch()] * 8) # TBU
 
-		n = 1000
+		n = 100
 		climbed = 1 # flag if an iteration changes, so don't have to recompute the evaluation
 		curr_soln_val = 0
 
@@ -63,7 +63,7 @@ class search_solver(subproblem):
 				continue
 
 			# accept with probability <1 if climbs down
-			# sh/ould be proportional to size of change but not sure what distance metric makes sense rn
+			# should be proportional to size of change but not sure what distance metric makes sense rn
 			if random.random() < 0.1:
 				curr_soln = candidate_soln
 				climbed = 1
@@ -86,8 +86,8 @@ class search_solver(subproblem):
 		proposed_pitch = int(random.gauss(pitch, pitch_sd))
 
 		# python is pass by ref right?
-		proposed_soln = soln.copy()
-		proposed_soln[i] = proposed_pitch
+		proposed_soln = copy.copy(soln)
+		proposed_soln[i] = util.make_notes([proposed_pitch])[0] # ew
 		return proposed_soln
 
 
@@ -95,10 +95,14 @@ class search_solver(subproblem):
     # Feature Evaluation Functions #
     ################################
 
-	def ensemble_evaluate(self):
-		pass
+	def ensemble_evaluate(self, soln):
+		"""
+			for now, relying only on tonality
+		"""
 
-	def tonality(self):
+		return self.tonality(soln)
+
+	def tonality(self, soln):
 		"""
 		how well does the solo use chord tones, tensions, and scales?
 		we don't want all notes to be chord tones, but we do want
@@ -108,7 +112,7 @@ class search_solver(subproblem):
 		"""
 		score = 0
 		tension = None
-		for note in self.solution:
+		for note in soln:
 			if tension and self.chord.is_tension_resolution((tension, note.as_letter())):
 				score += 5
 			tension = None
@@ -126,7 +130,7 @@ class search_solver(subproblem):
 
 
 
-	def contour(self):
+	def contour(self, soln):
 		"""
 		how well does the solo use contour? This includes an evaluation
 		of intervallic diversity: *in general* we want a good mix of half
@@ -142,6 +146,5 @@ class search_solver(subproblem):
 if __name__ == "__main__":
 	G7 = util.build_chord('G', 'I', '7')
 	P = search_solver(G7)
-	print P.tonality()
 	# print P.chord.get_chord_tones()
-	# util.write_midi(solo=P.get_sample_G7_solution(), chords=[P.chord])
+	util.write_midi(solo=P.search(), chords=[P.chord])
