@@ -5,11 +5,26 @@ import theory
 from midiutil import MIDIFile
 
 
+def compress(lst):
+	"""
+	like uniq for python list
+	"""
+	s = []
+	prev = None
+	for elt in lst:
+		if elt != prev:
+			s.append(elt)
+		prev = elt
+	return s
+
 def make_notes(pitches, duration=.5):
 	"""
 	convert a list of pitches to a list of note objects
 	"""
 	return [Note(p, duration=duration) for p in pitches]
+
+def make_pitches(notes):
+	return [note.as_pitch() for note in notes]
 
 def build_chord(key, numeral, quality, duration=4):
 	"""
