@@ -2,18 +2,30 @@
 
 import random, copy
 import util
-from problems import subproblem
 import numpy as np
 
-class search_solver(subproblem):
+
+class subproblem:
+	"""
+	defines the subproblem of soloing over one measure with one chord;
+	eventually, we can expand the features to we condition on, but for
+	now we keep it to just the current chord
+	"""
+
+	def __init__ (self, chord):
+		self.chord = chord
+
+	# more stuff?
+
+
+class search_solver:
 	"""
 	defines evaluation functions for a local search solution to the
 	subproblem, and solves the problem using local search
 	"""
 
-	def __init__(self, chord):
-		self.chord = chord
-		self.solution = self.get_solution()
+	def __init__ (self, subproblem):
+		self.chord = subproblem.chord
 
 	def get_solution(self):
 		"""
@@ -21,7 +33,7 @@ class search_solver(subproblem):
 		requirements of the subproblem and can be subjected to 
 		the feature evaluation functions
 		"""
-		return self.get_sample_G7_solution2()
+		return self.search()
 
 	def get_sample_G7_solution1(self):
 		return util.make_notes([86, 84, 81, 82, 83, 81, 79, 78])
@@ -164,9 +176,6 @@ class search_solver(subproblem):
 				directions.append(up)
 			else:
 				directions.append(same)
-
-		print intervals
-		print directions
 
 		abs_intervals = [abs(n) for n in intervals]
 
