@@ -2,6 +2,7 @@
 
 import random, copy
 import util
+import theory
 import numpy as np
 
 
@@ -54,7 +55,7 @@ class search_solver:
 			soln is a list of Note objects
 		"""
 		# initialize
-		curr_soln = util.make_notes([self.chord.get_root().get_pitch()] * 8) # TBU
+		curr_soln = util.make_notes([self.chord.get_root().get_pitch() + 24] * 8) # TBU
 
 		n = 100
 		climbed = 1 # flag if an iteration changes, so don't have to recompute the evaluation
@@ -113,7 +114,7 @@ class search_solver:
 			for now, relying only on tonality
 		"""
 
-		return self.tonality(soln) + self.contour(soln)
+		return self.tonality(soln) + self.contour(soln) + self.register(soln)
 
 
 	def tonality(self, solution):
@@ -199,6 +200,19 @@ class search_solver:
 		elif pitch_diff > 3:
 			score += 1
 		return score
+
+
+	def register(self, solution):
+		"""
+		penalities notes outside the desired register
+		"""
+		score = 0
+		for note in solution:
+			if note.get_pitch() not in theory.register:
+				score -= 5
+		# print "register score of:", score
+		return score
+
 
 
 
