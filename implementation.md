@@ -162,3 +162,8 @@ UPDATE: it's definitely easy (see `midi_test.py`)
 * Still need to link measures together by finishing to implement fixed notes
 * Still need to introduce more variation through different evaluation functions (maybe multiple weights of tonality)
 * Rhythm!!!
+
+## knobs
+
+* I think, 200 iterations seems to be pretty good for the basic hill climbing
+* initializing next solution with previous is a pretty good idea!

@@ -13,12 +13,16 @@ class subproblem:
 	now we keep it to just the current chord
 	"""
 
-	def __init__ (self, chord, fixed_notes=None):
+	def __init__ (self, chord, init_sol=None, fixed_notes=None):
 		self.chord = chord
+		self.init_sol = init_sol
 		self.fixed_notes = fixed_notes
 
 	def set_fixed_notes(self, fixed_notes):
 		self.fixed_notes = fixed_notes
+
+	def set_init_sol(self, init_sol):
+		self.init_sol = init_sol
 
 	# more stuff?
 
@@ -31,6 +35,7 @@ class search_solver:
 
 	def __init__ (self, subproblem):
 		self.chord = subproblem.chord
+		self.init_sol = subproblem.init_sol
 
 	def get_solution(self):
 		"""
@@ -61,7 +66,10 @@ class search_solver:
 			TO DO - add a scheduling / temperature function
 		"""
 		# initialize
-		curr_soln = util.make_notes([self.chord.get_root().get_pitch() + 24] * 8) # TBU
+		if self.init_sol:
+			curr_soln = self.init_sol
+		else:
+			curr_soln = util.make_notes([self.chord.get_root().get_pitch() + 24] * 8) # TBU
 		best_soln = curr_soln
 
 		n = 200

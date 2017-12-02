@@ -28,11 +28,14 @@ class problem:
 		subproblems based on solutions just created
 		"""
 		solo = []
+		sub_sol = None
 		fixed_pitch = self.chords[0].get_root().as_pitch()
 		if self.alg == "search":
 			for subp in self.subproblems:
+				subp.set_init_sol(sub_sol)
 				subp.set_fixed_notes({0:fixed_pitch})
-				solo += search_solver(subp).get_solution()
+				sub_sol = search_solver(subp).get_solution()
+				solo += sub_sol
 				fixed_pitch = solo[-1]
 		return solo
 
