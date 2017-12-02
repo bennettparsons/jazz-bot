@@ -17,13 +17,23 @@ class problem:
 		self.define_subproblems()
 
 	def define_subproblems(self):
+		"""
+		setup suproblems that are solved sequentially by get_solo
+		"""
 		self.subproblems = [subproblem(chord) for chord in self.chords]
 
 	def get_solo(self):
+		"""
+		create a solo over the progression; dynamically add constraints to
+		subproblems based on solutions just created
+		"""
 		solo = []
+		fixed_pitch = self.chords[0].get_root().as_pitch()
 		if self.alg == "search":
 			for subp in self.subproblems:
+				subp.set_fixed_notes({0:fixed_pitch})
 				solo += search_solver(subp).get_solution()
+				fixed_pitch = solo[-1]
 		return solo
 
 if __name__ == "__main__":

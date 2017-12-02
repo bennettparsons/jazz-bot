@@ -13,8 +13,12 @@ class subproblem:
 	now we keep it to just the current chord
 	"""
 
-	def __init__ (self, chord):
+	def __init__ (self, chord, fixed_notes=None):
 		self.chord = chord
+		self.fixed_notes = fixed_notes
+
+	def set_fixed_notes(self, fixed_notes):
+		self.fixed_notes = fixed_notes
 
 	# more stuff?
 
@@ -56,33 +60,42 @@ class search_solver:
 		"""
 		# initialize
 		curr_soln = util.make_notes([self.chord.get_root().get_pitch() + 24] * 8) # TBU
+		best_soln = curr_soln
 
-		n = 100
+		n = 200
 		climbed = 1 # flag if an iteration changes, so don't have to recompute the evaluation
 		curr_soln_val = 0
+		best_soln_val = curr_soln_val
 
 		for _ in range(n):
 
-			if climbed:
-				curr_soln_val = self.ensemble_evaluate(curr_soln)
-			climbed = 0
+			# if climbed:
+			# 	curr_soln_val = self.ensemble_evaluate(curr_soln)
+			# climbed = 0
 
 			# get neighbor node
 			candidate_soln = self.get_neighbor_node(curr_soln)
+			candidate_soln_val = self.ensemble_evaluate(candidate_soln)
 
 			# accept with probability 1 if climbs up
-			if self.ensemble_evaluate(candidate_soln) > curr_soln_val:
+			if candidate_soln_val > curr_soln_val:
 				curr_soln = candidate_soln
-				climbed = 1
-				continue
+				curr_soln_val = candidate_soln_val
+				# climbed = 1
 
 			# accept with probability <1 if climbs down
 			# should be proportional to size of change but not sure what distance metric makes sense rn
-			if random.random() < 0.1:
+			elif random.random() < 0.1:
 				curr_soln = candidate_soln
-				climbed = 1
+				curr_soln_val = candidate_soln_val
+				# climbed = 1
 
-		return curr_soln
+			if best_soln_val < curr_soln_val:
+				best_soln = curr_soln
+				best_soln_val = curr_soln_val
+
+		print "Score of:", best_soln_val
+		return best_soln
 
 
 	def get_neighbor_node(self, soln, pitch_sd=3):
@@ -160,7 +173,7 @@ class search_solver:
 		interval_variety = {1:0, 2:0, 3:1, 4:3, 5:3, 6:2, 7:1, 8:1}
 		direction_variety = {1:0, 2:2, 3:3, 4:3, 5:2, 6:1, 7:1, 8:1}
 		# interval_weights = [.5, .4, .3, .3, .3, .2, .2, .1]
-		interval_weights = [1, .8, .6, .5, .3, .2, .2, .1]
+		interval_weights = [1, .8, .6, .5, .3, .2, .1, 0, -.1, -.2, -.3, .2]
 
 		sol = util.make_pitches(solution)
 		up = "up"
@@ -190,7 +203,12 @@ class search_solver:
 			score -= directions.count(same)
 
 		# slightly incentivize small intervals over large ones
-		score += np.dot([abs_intervals.count(i+1) for i in range(8)], interval_weights)
+		score += np.dot([abs_intervals.count(i+1) for i in range(12)], interval_weights)
+
+		# disincentivize leaps larger than an octave
+		for interval in abs_intervals:
+			if interval in theory.large_leap:
+				score -= 3
 
 		# incentivize a downward or upward line
 		pitch_diff = sum(intervals)

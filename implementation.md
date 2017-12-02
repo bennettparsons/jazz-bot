@@ -155,3 +155,10 @@ On the simplest blues form, we just use dominant chords. Check out [this](https:
 Should be pretty simple using [this](https://pypi.python.org/pypi/MIDIUtil/) python midi library. Look at [this guy's code](https://github.com/ckdotca/JSB2/blob/master/JSB2.py) for inspiration on how to use this library to generate chords and melodies.
 
 UPDATE: it's definitely easy (see `midi_test.py`)
+
+# Thoughts
+
+* Specifically, randomness in neighbor function needs to be fixed; we should also start off the local search with a more intuitive solution
+* Still need to link measures together by finishing to implement fixed notes
+* Still need to introduce more variation through different evaluation functions (maybe multiple weights of tonality)
+* Rhythm!!!

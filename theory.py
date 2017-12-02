@@ -34,7 +34,7 @@ fifth = [7]
 sixth = [8,9]
 sevneth = [10,11]
 
-large_leap = [n+5 for n in range(50)]
+large_leap = [n+13 for n in range(50)]
 
 # play notes from this range for solo
 register = [n+54 for n in range(36)]
