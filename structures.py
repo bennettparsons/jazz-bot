@@ -21,10 +21,10 @@ class Note:
 		self.duration = duration
 		self.volume = std_volume
 
-	def set_duration(duration):
+	def set_duration(self, duration):
 		self.duration = duration
 
-	def transpose(steps, up=True):
+	def transpose(self, steps, up=True):
 		if up:
 			self.pitch += steps
 		else:
