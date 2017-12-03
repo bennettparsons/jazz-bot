@@ -36,6 +36,9 @@ class Note:
 	def as_letter(self):
 		return self.pitches[self.pitch%12]
 
+	def is_rest(self):
+		return self.pitch == 0
+
 	def __str__ (self):
 		return self.as_letter() + ": " + str(self.duration)
 

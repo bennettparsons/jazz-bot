@@ -162,9 +162,18 @@ UPDATE: it's definitely easy (see `midi_test.py`)
 * Still need to link measures together by finishing to implement fixed notes: done!
 * Still need to introduce more variation through different evaluation functions (maybe multiple weights of tonality)
 * Rhythm!!!
+* could pre-process fixed notes to make a larger line
 
 ## knobs
 
 * I think, 200 iterations seems to be pretty good for the basic hill climbing
 * initializing next solution with previous is a pretty good idea! With this, we can add to the subproblems a heuristic that encourages or discourages similarity to the previous bar (or parts of the bar)
 * resolution feature is good, but needs notion of history: keeps returning the same solution! Could introduce a history that disincentivizes repition, or just sample out certain possible resolutions in classic, random fashion
+* making it more tonal is pretty sick
+
+## specific TODOs:
+
+* fix resolution so that it is probabilistic
+* implement rhythm: could just sample from outputted eighth notes?
+* notion of choruses: denseness of rhythms should be a function of this, as well as feature functions e.g. tonality, whether or not to initialize with previous solution (this should reset at certain points)
+

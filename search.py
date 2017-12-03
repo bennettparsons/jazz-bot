@@ -50,7 +50,7 @@ class search_solver:
 		requirements of the subproblem and can be subjected to 
 		the feature evaluation functions
 		"""
-		return self.search()
+		return self.GA()
 
 	def get_resolution(self):
 		"""
@@ -76,6 +76,13 @@ class search_solver:
 		# print "Best sol is:", max(sols), max(sols)[0], max(sols)[1].as_letter()
 
 		return max(sols)[1]
+
+
+	def get_rhythms(self, sz):
+		"""
+		post process rhythms by sampling sz notes from self.solution
+		"""
+		pass
 
 	def get_sample_G7_solution1(self):
 		return util.make_notes([86, 84, 81, 82, 83, 81, 79, 78])
@@ -287,11 +294,11 @@ class search_solver:
 			tension = None
 			letter = note.as_letter()
 			if chord.is_third_or_seventh(letter):
-				score += 3
+				score += 6
 			elif chord.is_chord_tone(letter):
-				score += 2
+				score += 5
 			elif chord.is_in_scale(letter):
-				score += 1
+				score += 4
 			elif chord.is_tension(letter):
 				tension = letter
 		return score

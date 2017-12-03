@@ -49,7 +49,8 @@ def build_progression(key, numerals, duration=4):
 def write_midi_solo(midi, track, solo, channel):
 	t = 0
 	for note in solo:
-		midi.addNote(track, channel, note.as_pitch(), t, note.duration, note.volume)
+		if not note.is_rest():
+			midi.addNote(track, channel, note.as_pitch(), t, note.duration, note.volume)
 		t += note.duration
 	return midi
 
