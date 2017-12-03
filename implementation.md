@@ -166,4 +166,4 @@ UPDATE: it's definitely easy (see `midi_test.py`)
 ## knobs
 
 * I think, 200 iterations seems to be pretty good for the basic hill climbing
-* initializing next solution with previous is a pretty good idea!
+* initializing next solution with previous is a pretty good idea! With this, we can add to the subproblems a heuristic that encourages or discourages similarity to the previous bar (or parts of the bar)

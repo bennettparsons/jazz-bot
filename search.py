@@ -3,6 +3,7 @@
 import random, copy
 import util
 import theory
+from structures import Note
 import numpy as np
 
 
@@ -36,6 +37,7 @@ class search_solver:
 	def __init__ (self, subproblem):
 		self.chord = subproblem.chord
 		self.init_sol = subproblem.init_sol
+		self.fixed_notes = subproblem.fixed_notes
 
 	def get_solution(self):
 		"""
@@ -117,6 +119,9 @@ class search_solver:
 
 		# sample a single note
 		i = random.choice(range(len(soln)))
+		if self.fixed_notes:
+			while (i in self.fixed_notes):
+				i = random.choice(range(len(soln)))
 
 		# sample notes to replace this note
 		pitch = soln[i].get_pitch()
@@ -124,7 +129,7 @@ class search_solver:
 
 		# python is pass by ref right?
 		proposed_soln = copy.copy(soln)
-		proposed_soln[i] = util.make_notes([proposed_pitch])[0] # ew
+		proposed_soln[i] = Note(proposed_pitch, duration=.5)
 		return proposed_soln
 
 	################################
@@ -138,7 +143,7 @@ class search_solver:
 		"""
 		# globals
 		generation_sz = 10
-		generations = 1000
+		generations = 10
 
 		# intialize initial population
 		population = self.generate_population(generation_sz)
@@ -333,6 +338,6 @@ class search_solver:
 if __name__ == "__main__":
 	G7 = util.build_chord('G', 'I', '7')
 	C7 = util.build_chord('C', 'I', 'M7')
-	P1 = search_solver(G7)
-	P2 = search_solver(C7)
-	util.write_midi(solo=P1.GA() + P2.GA(), chords=[P1.chord, P2.chord])
+	sub = subproblem(G7)
+	notes = search_solver(sub).get_solution()
+	util.write_midi(solo=notes, chords=[G7])

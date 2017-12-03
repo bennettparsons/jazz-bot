@@ -3,7 +3,7 @@
 import theory
 
 std_volume = 100
-std_note_dur = 1
+std_note_dur = .5
 std_chord_dur = 4
 
 
