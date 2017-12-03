@@ -29,14 +29,14 @@ class problem:
 		"""
 		solo = []
 		sub_sol = None
-		fixed_pitch = self.chords[0].get_root().as_pitch()
+		fixed_notes = None
 		if self.alg == "search":
 			for subp in self.subproblems:
 				subp.set_init_sol(sub_sol)
-				subp.set_fixed_notes({0:fixed_pitch})
+				subp.set_fixed_notes(fixed_notes)
 				sub_sol = search_solver(subp).get_solution()
 				solo += sub_sol
-				fixed_pitch = solo[-1]
+				fixed_notes = {0: solo[-1]}
 		return solo
 
 if __name__ == "__main__":

@@ -58,7 +58,7 @@ def write_midi_chords(midi, track, chords, channel):
 		t += note.duration
 	return midi
 
-def write_midi(solo=None, chords=None, outfile="jazzy-bot-solo.mid", channel=0, tempo=144):
+def write_midi(solo=None, chords=None, outfile="jazzy-bot-solo.mid", channel=0, tempo=160):
 	"""
 	write a midi file based on solo, a list of Note objects, and chords, a
 	list of chord objects

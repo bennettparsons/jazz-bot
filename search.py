@@ -72,6 +72,9 @@ class search_solver:
 			curr_soln = self.init_sol
 		else:
 			curr_soln = util.make_notes([self.chord.get_root().get_pitch() + 24] * 8) # TBU
+		if self.fixed_notes:
+			for i in self.fixed_notes:
+				curr_soln[i] = self.fixed_notes[i]
 		best_soln = curr_soln
 
 		n = 200
@@ -176,7 +179,9 @@ class search_solver:
 			population = successor_population
 
 		# return the fittest individual
-		return sorted(population, key=lambda individual: self.get_fitness(individual), reverse=True)[0]
+		best_sol = sorted(population, key=lambda individual: self.get_fitness(individual), reverse=True)[0]
+		print "Score of:", self.get_fitness(best_sol)
+		return best_sol
 
 	def generate_individual_for_population(self):
 		"""
