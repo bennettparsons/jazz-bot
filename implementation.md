@@ -158,8 +158,8 @@ UPDATE: it's definitely easy (see `midi_test.py`)
 
 # Thoughts
 
-* Specifically, randomness in neighbor function needs to be fixed; we should also start off the local search with a more intuitive solution
-* Still need to link measures together by finishing to implement fixed notes
+* Specifically, randomness in neighbor function needs to be fixed; we should also start off the local search with a more intuitive solution: done!
+* Still need to link measures together by finishing to implement fixed notes: done!
 * Still need to introduce more variation through different evaluation functions (maybe multiple weights of tonality)
 * Rhythm!!!
 
@@ -167,3 +167,4 @@ UPDATE: it's definitely easy (see `midi_test.py`)
 
 * I think, 200 iterations seems to be pretty good for the basic hill climbing
 * initializing next solution with previous is a pretty good idea! With this, we can add to the subproblems a heuristic that encourages or discourages similarity to the previous bar (or parts of the bar)
+* resolution feature is good, but needs notion of history: keeps returning the same solution! Could introduce a history that disincentivizes repition, or just sample out certain possible resolutions in classic, random fashion

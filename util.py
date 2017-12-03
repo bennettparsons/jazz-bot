@@ -3,7 +3,11 @@
 from structures import Note, Chord
 import theory
 from midiutil import MIDIFile
+from midiutil.MidiFile import *
 
+
+def interval(n1, n2):
+	return n2.as_pitch() - n1.as_pitch()
 
 def compress(lst):
 	"""
@@ -76,6 +80,7 @@ def write_midi(solo=None, chords=None, outfile="jazzy-bot-solo.mid", channel=0, 
 			write_midi_solo(midi, 0, solo, channel)
 		elif chords:
 			write_midi_chords(midi, 0, chords, channel)
+	midi.addKeySignature(0, 0, 1, SHARPS, MAJOR)
 	with open(outfile, "wb") as f:
 		midi.writeFile(f)
 

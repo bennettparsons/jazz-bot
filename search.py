@@ -14,10 +14,12 @@ class subproblem:
 	now we keep it to just the current chord
 	"""
 
-	def __init__ (self, chord, init_sol=None, fixed_notes=None):
+	def __init__ (self, chord, init_sol=None, fixed_notes=None, res_chord=None):
 		self.chord = chord
 		self.init_sol = init_sol
 		self.fixed_notes = fixed_notes
+		self.res_chord = res_chord
+		self.solution = None
 
 	def set_fixed_notes(self, fixed_notes):
 		self.fixed_notes = fixed_notes
@@ -38,6 +40,9 @@ class search_solver:
 		self.chord = subproblem.chord
 		self.init_sol = subproblem.init_sol
 		self.fixed_notes = subproblem.fixed_notes
+		self.res_chord = subproblem.res_chord
+		self.solution = None
+		self.active_chord = self.chord
 
 	def get_solution(self):
 		"""
@@ -47,11 +52,38 @@ class search_solver:
 		"""
 		return self.search()
 
+	def get_resolution(self):
+		"""
+		return a single note representing the resolution of the current
+		solution to the next chord in the progression (self.res_chord);
+		should only be called once self.solution is generated
+		"""
+		assert(self.solution)
+		self.active_chord = self.res_chord
+		prev_note = self.solution[-1]
+		proposed_soln = copy.copy(prev_note)
+		proposed_soln.transpose(7, up=False)
+		sols = []
+		# print prev_note
+		# print
+		while(abs(util.interval(proposed_soln, prev_note)) <= 8):
+			sols.append((self.resolution_evaluate(prev_note, proposed_soln), proposed_soln))
+			# print "Score of:", sols[-1][0], "for note", sols[-1][1]
+			proposed_soln = copy.copy(proposed_soln)
+			proposed_soln.transpose(1)
+
+		# print
+		# print "Best sol is:", max(sols), max(sols)[0], max(sols)[1].as_letter()
+
+		return max(sols)[1]
+
 	def get_sample_G7_solution1(self):
 		return util.make_notes([86, 84, 81, 82, 83, 81, 79, 78])
 
 	def get_sample_G7_solution2(self):
 		return util.make_notes([77, 81, 76, 79, 77, 69, 72, 74])
+
+
 
 
 
@@ -78,15 +110,10 @@ class search_solver:
 		best_soln = curr_soln
 
 		n = 200
-		climbed = 1 # flag if an iteration changes, so don't have to recompute the evaluation
 		curr_soln_val = 0
 		best_soln_val = curr_soln_val
 
 		for _ in range(n):
-
-			# if climbed:
-			# 	curr_soln_val = self.ensemble_evaluate(curr_soln)
-			# climbed = 0
 
 			# get neighbor node
 			candidate_soln = self.get_neighbor_node(curr_soln)
@@ -96,20 +123,19 @@ class search_solver:
 			if candidate_soln_val > curr_soln_val:
 				curr_soln = candidate_soln
 				curr_soln_val = candidate_soln_val
-				# climbed = 1
 
 			# accept with probability <1 if climbs down
 			# should be proportional to size of change but not sure what distance metric makes sense rn
 			elif random.random() < 0.1:
 				curr_soln = candidate_soln
 				curr_soln_val = candidate_soln_val
-				# climbed = 1
 
 			if best_soln_val < curr_soln_val:
 				best_soln = curr_soln
 				best_soln_val = curr_soln_val
 
 		print "Score of:", best_soln_val
+		self.solution = best_soln
 		return best_soln
 
 
@@ -181,6 +207,7 @@ class search_solver:
 		# return the fittest individual
 		best_sol = sorted(population, key=lambda individual: self.get_fitness(individual), reverse=True)[0]
 		print "Score of:", self.get_fitness(best_sol)
+		self.solution = best_sol
 		return best_sol
 
 	def generate_individual_for_population(self):
@@ -235,6 +262,13 @@ class search_solver:
 		return self.tonality(soln) + self.contour(soln) + self.register(soln)
 
 
+	def resolution_evaluate(self, prev_note, res_note):
+		"""
+		evaluate just the resolution pitch
+		"""
+		return self.tonality([res_note]) + self.distance([prev_note, res_note])
+
+
 	def tonality(self, solution):
 		"""
 		how well does the solo use chord tones, tensions, and scales?
@@ -245,19 +279,20 @@ class search_solver:
 		"""
 		score = 0
 		tension = None
+		chord = self.active_chord
 
 		for note in solution:
-			if tension and self.chord.is_tension_resolution((tension, note.as_letter())):
+			if tension and chord.is_tension_resolution((tension, note.as_letter())):
 				score += 5
 			tension = None
 			letter = note.as_letter()
-			if self.chord.is_third_or_seventh(letter):
+			if chord.is_third_or_seventh(letter):
 				score += 3
-			elif self.chord.is_chord_tone(letter):
+			elif chord.is_chord_tone(letter):
 				score += 2
-			elif self.chord.is_in_scale(letter):
+			elif chord.is_in_scale(letter):
 				score += 1
-			elif self.chord.is_tension(letter):
+			elif chord.is_tension(letter):
 				tension = letter
 		return score
 
@@ -338,6 +373,21 @@ class search_solver:
 		return score
 
 
+	def distance(self, solution):
+		"""
+		very simple distance function for evaluation scoring. Simply
+		encourages smaller steps over larger ones. Can be used for
+		finding a very simple resolution pitch for a solution
+		"""
+		score = 0
+		assert(len(solution) >= 2)
+		intervals = []
+		sol = util.make_pitches(solution)
+
+		curr_p = sol[0]
+		for next_p in sol[1:]:
+			intervals.append(abs(curr_p - next_p))
+		return sum([2/x if x != 0 else -.2 for x in intervals])
 
 
 if __name__ == "__main__":
