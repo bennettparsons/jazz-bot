@@ -59,7 +59,7 @@ class search_solver:
 			requirements of the subproblem and can be subjected to 
 			the feature evaluation functions
 		"""
-		self.search()
+		self.GA()
 		# assert(self.solution)
 		self.rhythms()
 		# verify invariants
@@ -267,7 +267,10 @@ class search_solver:
 
 				# selection time
 				# 	sample parents with probability that's proportional to fitness
-				fitness = [self.get_fitness(individual) for individual in population]
+				fitness = [self.get_fitness(individual) 
+							if self.get_fitness(individual) > 0 else 0 # fitness function can be <0 e.g. for bad register scoring
+							for individual in population]
+
 				normalized_fitness = map(lambda x: x / float(sum(fitness)), fitness)
 
 				# np.random allows specifying a distribution, but works on 1-d array only, hence indexing
@@ -294,10 +297,24 @@ class search_solver:
 		"""
 			list of Notes
 		"""
-		pitch_sd = 3 # \sigma = 3 1/2 steps
-		pitches = [self.chord.get_root().get_pitch()+24] * 8
-		pitches = map(lambda pitch: int(random.gauss(pitch, pitch_sd)), pitches)
-		return util.make_notes(pitches)
+
+		if self.init_sol:
+			assert(len(self.init_sol) == self.size)
+			pitches = copy.copy(self.init_sol)
+		else:
+			pitches = util.make_notes([self.chord.get_root().get_pitch() + 24] * self.size)
+		
+		if self.fixed_notes:
+			for i in self.fixed_notes:
+				pitches[i] = self.fixed_notes[i]
+
+		return pitches
+		
+
+		# pitch_sd = 3 # \sigma = 3 1/2 steps
+		# pitches = [self.chord.get_root().get_pitch()+24] * 8
+		# pitches = map(lambda pitch: int(random.gauss(pitch, pitch_sd)), pitches)
+		# return util.make_notes(pitches)
 
 	def generate_population(self, sz):
 		"""
@@ -323,6 +340,9 @@ class search_solver:
 		"""
 		mutated_child = copy.copy(child)
 		for note_index, note in enumerate(mutated_child):
+			if self.fixed_notes:
+				if note_index in self.fixed_notes:
+					continue
 			if random.random() < 0.05:
 				pitch = note.get_pitch()
 				new_pitch = int(random.gauss(pitch, 3))  # \sigma = 3 1/2 steps, again

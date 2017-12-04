@@ -24,7 +24,7 @@ class problem:
 		subps = []
 		curr_chord = self.chords[0]
 		for res_chord in self.chords[1:]:
-			sz = random.choice([n+1 for n in range(8)])
+			sz = random.choice([n+6 for n in range(3)])
 			subps.append(subproblem(curr_chord, res_chord=res_chord, size=sz))
 			curr_chord = res_chord
 		self.subproblems = subps
