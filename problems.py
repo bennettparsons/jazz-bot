@@ -41,7 +41,7 @@ class problem:
 		if self.alg == "search":
 			for subp in self.subproblems:
 				# setup problem constraints
-				subp.set_init_sol(copy.copy(sub_sol))
+				subp.set_init_sol(sub_sol)
 				# subp.set_fixed_notes(fixed_notes)
 
 				# solve

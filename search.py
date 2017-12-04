@@ -17,14 +17,16 @@ class subproblem:
 	def __init__ (self, chord, init_sol=None, fixed_notes=None, res_chord=None, size=8):
 		self.chord = chord
 		# init_sol must have length of size
-		if init_sol:
-			print "something"
-			while len(init_sol) != size:
-				if len(init_sol) < size:
-					init_sol.append(init_sol[-1])
-				else:
-					del init_sol[random.choice(range(len(init_sol)))]
-		self.init_sol = init_sol
+		# if init_sol:
+		# 	print "something"
+		# 	while len(init_sol) != size:
+		# 		if len(init_sol) < size:
+		# 			init_sol.append(init_sol[-1])
+		# 		else:
+		# 			del init_sol[random.choice(range(len(init_sol)))]
+		self.init_sol = copy.copy(init_sol)
+		# if self.init_sol:
+		# 	print "HEY"
 		self.fixed_notes = fixed_notes
 		self.res_chord = res_chord
 		self.solution = None
@@ -47,12 +49,18 @@ class search_solver:
 
 	def __init__ (self, subproblem):
 		self.chord = subproblem.chord
+		self.size = subproblem.size
 		self.init_sol = subproblem.init_sol
+		if self.init_sol:
+			while len(self.init_sol) != self.size:
+				if len(self.init_sol) < self.size:
+					self.init_sol.append(self.init_sol[-1])
+				else:
+					del self.init_sol[random.choice(range(len(self.init_sol)))]
 		self.fixed_notes = subproblem.fixed_notes
 		self.res_chord = subproblem.res_chord
 		self.solution = None
 		self.active_chord = self.chord
-		self.size = subproblem.size
 
 	def get_solution(self):
 		"""
@@ -65,6 +73,8 @@ class search_solver:
 		# verify invariants
 		assert(sum([note.get_duration() for note in self.solution]) == 4)
 		assert(len(self.solution) == self.size)
+		for note in self.solution:
+			assert(note.get_duration() != 0)
 		return self.solution
 
 	def get_resolution(self):
@@ -106,6 +116,7 @@ class search_solver:
 			else:
 				self.solution[i].add_duration(-.5)
 				curr_dur -= .5
+		assert(sum([note.get_duration() for note in self.solution]) == 4)
 
 
 	def get_rhythms(self, sz):
