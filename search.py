@@ -9,9 +9,9 @@ import numpy as np
 
 class subproblem:
 	"""
-	defines the subproblem of soloing over one measure with one chord;
-	eventually, we can expand the features to we condition on, but for
-	now we keep it to just the current chord
+		defines the subproblem of soloing over one measure with one chord;
+		eventually, we can expand the features to we condition on, but for
+		now we keep it to just the current chord
 	"""
 
 	def __init__ (self, chord, init_sol=None, fixed_notes=None, res_chord=None, size=8):
@@ -33,8 +33,8 @@ class subproblem:
 
 class search_solver:
 	"""
-	defines evaluation functions for a local search solution to the
-	subproblem, and solves the problem using local search
+		defines evaluation functions for a local search solution to the
+		subproblem, and solves the problem using local search
 	"""
 
 	def __init__ (self, subproblem):
@@ -55,9 +55,9 @@ class search_solver:
 
 	def get_solution(self):
 		"""
-		generate a solution: a sequence of notes that obeys the 
-		requirements of the subproblem and can be subjected to 
-		the feature evaluation functions
+			generate a solution: a sequence of notes that obeys the 
+			requirements of the subproblem and can be subjected to 
+			the feature evaluation functions
 		"""
 		self.search()
 		self.rhythms()
@@ -70,9 +70,9 @@ class search_solver:
 
 	def get_resolution(self):
 		"""
-		return a single note representing the resolution of the current
-		solution to the next chord in the progression (self.res_chord);
-		should only be called once self.solution is generated
+			return a single note representing the resolution of the current
+			solution to the next chord in the progression (self.res_chord);
+			should only be called once self.solution is generated
 		"""
 		assert(self.solution)
 		self.active_chord = self.res_chord
@@ -96,7 +96,7 @@ class search_solver:
 
 	def rhythms(self):
 		"""
-		solution must have total duration of 4 beats
+			solution must have total duration of 4 beats
 		"""
 		curr_dur = sum([note.get_duration() for note in self.solution])
 		while curr_dur != 4:
@@ -113,8 +113,8 @@ class search_solver:
 
 	def get_rhythms(self, sz):
 		"""
-		THIS FUNCTION IS DEPRECATED
-		post process rhythms by sampling sz notes from self.solution
+			THIS FUNCTION IS DEPRECATED
+			post process rhythms by sampling sz notes from self.solution
 		"""
 		assert(0)  # deprecated
 		assert(self.solution)
@@ -320,32 +320,41 @@ class search_solver:
 		return mutated_child
 
 	################################
-    # Feature Evaluation Functions #
-    ################################
+	# Feature Evaluation Functions #
+	################################
+
+	def get_params(self, funcs):
+		"""
+		returns subproblem specific parameters for feature evaluation
+		functions funcs; for now, just a function of the solution size
+		"""
+		return [theory.params[func][self.size-1] for func in funcs]
+
 
 	def ensemble_evaluate(self, soln):
 		"""
 			evaluate on tonality, contour and register
 
 		"""
-
-		return self.tonality(soln) + self.contour(soln) + self.register(soln)
+		params = self.get_params(("tonality", "contour"))
+		return self.tonality(soln, params[0]) + self.contour(soln, params[1]) + self.register(soln)
 
 
 	def resolution_evaluate(self, prev_note, res_note):
 		"""
-		evaluate just the resolution pitch
+			evaluate just the resolution pitch
 		"""
-		return self.tonality([res_note]) + self.distance([prev_note, res_note])
+		params = self.get_params(("tonality", "distance"))
+		return self.tonality([res_note], params[0]) + self.distance([prev_note, res_note], params[1])
 
 
-	def tonality(self, solution):
+	def tonality(self, solution, params):
 		"""
-		how well does the solo use chord tones, tensions, and scales?
-		we don't want all notes to be chord tones, but we do want
-		*important* notes to be chord notes; we may hardcode important
-		tones as a feature of subproblem, retrievable with a call to
-		get_important_notes()
+			how well does the solo use chord tones, tensions, and scales?
+			we don't want all notes to be chord tones, but we do want
+			*important* notes to be chord notes; we may hardcode important
+			tones as a feature of subproblem, retrievable with a call to
+			get_important_notes()
 		"""
 		score = 0
 		tension = None
@@ -353,22 +362,22 @@ class search_solver:
 
 		for note in solution:
 			if tension and chord.is_tension_resolution((tension, note.as_letter())):
-				score += 5
+				score += params["tension"]
 			tension = None
 			letter = note.as_letter()
 			if chord.is_third_or_seventh(letter):
-				score += 3
+				score += params["third_or_seventh"]
 			elif chord.is_chord_tone(letter):
-				score += 2
+				score += params["chord_tone"]
 			elif chord.is_in_scale(letter):
-				score += 1
+				score += params["scale"]
 			elif chord.is_tension(letter):
 				tension = letter
 		return score
 
 
 
-	def contour(self, solution):
+	def contour(self, solution, params):
 		"""
 		how well does the solo use contour? This includes an evaluation
 		of intervallic diversity: *in general* we want a good mix of half
@@ -383,11 +392,11 @@ class search_solver:
 
 		score = 0
 
-		# heuristics
-		interval_variety = {1:0, 2:0, 3:1, 4:3, 5:3, 6:2, 7:1, 8:1}
-		direction_variety = {1:0, 2:2, 3:3, 4:3, 5:2, 6:1, 7:1, 8:1}
+		# heuristics: DEPRECATED by params
+		# interval_variety = {1:0, 2:0, 3:1, 4:3, 5:3, 6:2, 7:1, 8:1}
+		# direction_variety = {1:0, 2:2, 3:3, 4:3, 5:2, 6:1, 7:1, 8:1}
 		# interval_weights = [.5, .4, .3, .3, .3, .2, .2, .1]
-		interval_weights = [1, .8, .6, .5, .3, .2, .1, 0, -.1, -.2, -.3, .2]
+		# interval_weights = [1, .8, .6, .5, .3, .2, .1, 0, -.1, -.2, -.3, .2]
 
 		sol = util.make_pitches(solution)
 		up = "up"
@@ -410,29 +419,28 @@ class search_solver:
 
 		# incentivize varied contour and intervalls
 		if len(solution) >= 5:
-			score += interval_variety[len(util.compress(abs_intervals))]
-			score += direction_variety[len(util.compress(directions))]
-
-		# slight penalization for repeating notes
-		if directions.count(same) > 2:
-			score -= directions.count(same)
+			score += params["interval_variety"][len(util.compress(abs_intervals))]
+			score += params["direction_variety"][len(util.compress(directions))]
 
 		# slightly incentivize small intervals over large ones
-		score += np.dot([abs_intervals.count(i+1) for i in range(12)], interval_weights)
+		score += np.dot([abs_intervals.count(i+1) for i in range(12)], params["interval_weights"])
+
+		# slight penalization for repeating notes
+		score += params["same"][directions.count(same)]
 
 		# disincentivize leaps larger than an octave
 		for interval in abs_intervals:
 			if interval in theory.large_leap:
-				score -= 3
+				score += params["large_leap"]
 
 		# incentivize a downward or upward line
 		pitch_diff = sum(intervals)
 		if pitch_diff > 12:
-			score += 2
+			score += params["line"][0]
 		elif pitch_diff > 7:
-			score += 2
+			score += params["line"][1]
 		elif pitch_diff > 3:
-			score += 1
+			score += params["line"][2]
 		return score
 
 
@@ -447,7 +455,7 @@ class search_solver:
 		return score
 
 
-	def distance(self, solution):
+	def distance(self, solution, params):
 		"""
 		very simple distance function for evaluation scoring. Simply
 		encourages smaller steps over larger ones. Can be used for

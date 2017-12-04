@@ -6,10 +6,10 @@ import random, copy
 
 class problem:
 	"""
-	defines the problem of soloing over a given chord progression;
-	it delineates the problem into subproblems, consisting of a measure
-	and the corresponding chord in the progression (and some more 
-	heuristics to come later!) and stitches them together smoothly
+		defines the problem of soloing over a given chord progression;
+		it delineates the problem into subproblems, consisting of a measure
+		and the corresponding chord in the progression (and some more 
+		heuristics to come later!) and stitches them together smoothly
 	"""
 
 	def __init__  (self, progression, alg="search"):
@@ -19,20 +19,20 @@ class problem:
 
 	def define_subproblems(self):
 		"""
-		setup suproblems that are solved sequentially by get_solo
+			setup suproblems that are solved sequentially by get_solo
 		"""
 		subps = []
 		curr_chord = self.chords[0]
 		for res_chord in self.chords[1:]:
-			sz = random.choice([n+4 for n in range(5)])
+			sz = random.choice([n+6 for n in range(3)])
 			subps.append(subproblem(curr_chord, res_chord=res_chord, size=sz))
 			curr_chord = res_chord
 		self.subproblems = subps
 
 	def get_solo(self):
 		"""
-		create a solo over the progression; dynamically add constraints to
-		subproblems based on solutions just created
+			create a solo over the progression; dynamically add constraints to
+			subproblems based on solutions just created
 		"""
 		sz = 4    # used in get_rhythms
 		solo = []

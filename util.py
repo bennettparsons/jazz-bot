@@ -11,7 +11,7 @@ def interval(n1, n2):
 
 def compress(lst):
 	"""
-	like uniq for python list
+		like uniq for python list
 	"""
 	s = []
 	prev = None
@@ -23,7 +23,7 @@ def compress(lst):
 
 def make_notes(pitches, duration=.5):
 	"""
-	convert a list of pitches to a list of note objects
+		convert a list of pitches to a list of note objects
 	"""
 	return [Note(p, duration=duration) for p in pitches]
 
@@ -32,7 +32,7 @@ def make_pitches(notes):
 
 def build_chord(key, numeral, quality, duration=4):
 	"""
-	constructs a Chord object given a key, numeral, quality and duration
+		constructs a Chord object given a key, numeral, quality and duration
 	"""
 	key_offset = theory.keys[key]
 	numeral_offset = theory.numerals[numeral]
@@ -41,7 +41,7 @@ def build_chord(key, numeral, quality, duration=4):
 
 def build_progression(key, numerals, duration=4):
 	"""
-	builds a chord progression, in whole notes, given a list of chords and a key
+		builds a chord progression, in whole notes, given a list of chords and a key
 	"""
 	return [build_chord(key, n, q, duration=duration) for n,q in numerals]
 
@@ -65,8 +65,8 @@ def write_midi_chords(midi, track, chords, channel):
 
 def write_midi(solo=None, chords=None, outfile="jazzy-bot-solo.mid", channel=0, tempo=160):
 	"""
-	write a midi file based on solo, a list of Note objects, and chords, a
-	list of chord objects
+		write a midi file based on solo, a list of Note objects, and chords, a
+		list of chord objects
 	"""
 	assert(solo or chords)
 	if solo and chords:

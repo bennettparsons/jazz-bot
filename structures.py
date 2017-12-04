@@ -9,7 +9,7 @@ std_chord_dur = 4
 
 class Note:
 	"""
-	A Note consists of midi pitch value and a duration
+		A Note consists of midi pitch value and a duration
 	"""
 
 	pitches = ['C', 'Db', 'D', 'Eb', 'E', 'F', 
@@ -59,7 +59,7 @@ class Note:
 
 class Chord:
 	"""
-	A Chord consists of a bunch of notes, and a quality
+		A Chord consists of a bunch of notes, and a quality
 	"""
 
 	def __init__ (self, notes=None, key=None, numeral=None, quality=None, duration=std_chord_dur, volume=std_volume):
