@@ -24,7 +24,7 @@ class problem:
 		subps = []
 		curr_chord = self.chords[0]
 		for res_chord in self.chords[1:]:
-			sz = random.choice([n+2 for n in range(6)])
+			sz = random.choice([n+4 for n in range(5)])
 			subps.append(subproblem(curr_chord, res_chord=res_chord, size=sz))
 			curr_chord = res_chord
 		self.subproblems = subps
@@ -41,12 +41,13 @@ class problem:
 		if self.alg == "search":
 			for subp in self.subproblems:
 				# setup problem constraints
-				subp.set_init_sol(sub_sol)
-				# subp.set_fixed_notes(fixed_notes)
+				subp.set_init_sol(copy.deepcopy(sub_sol))
+				subp.set_fixed_notes(fixed_notes)
 
 				# solve
 				solver = search_solver(subp)
 				sub_sol = solver.get_solution()
+				assert(sum([note.get_duration() for note in sub_sol]) == 4)
 				fixed_notes = {0: solver.get_resolution()}
 				solo += sub_sol
 		final_note = fixed_notes[0]

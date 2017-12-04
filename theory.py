@@ -37,4 +37,4 @@ sevneth = [10,11]
 large_leap = [n+13 for n in range(50)]
 
 # play notes from this range for solo
-register = [n+54 for n in range(36)]
+register = [n+56 for n in range(45)]

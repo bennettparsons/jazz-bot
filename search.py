@@ -16,17 +16,7 @@ class subproblem:
 
 	def __init__ (self, chord, init_sol=None, fixed_notes=None, res_chord=None, size=8):
 		self.chord = chord
-		# init_sol must have length of size
-		# if init_sol:
-		# 	print "something"
-		# 	while len(init_sol) != size:
-		# 		if len(init_sol) < size:
-		# 			init_sol.append(init_sol[-1])
-		# 		else:
-		# 			del init_sol[random.choice(range(len(init_sol)))]
-		self.init_sol = copy.copy(init_sol)
-		# if self.init_sol:
-		# 	print "HEY"
+		self.init_sol = init_sol
 		self.fixed_notes = fixed_notes
 		self.res_chord = res_chord
 		self.solution = None
@@ -51,6 +41,7 @@ class search_solver:
 		self.chord = subproblem.chord
 		self.size = subproblem.size
 		self.init_sol = subproblem.init_sol
+		# init_sol must have proper length
 		if self.init_sol:
 			while len(self.init_sol) != self.size:
 				if len(self.init_sol) < self.size:
@@ -105,22 +96,24 @@ class search_solver:
 
 	def rhythms(self):
 		"""
-		make it be a real measure
+		solution must have total duration of 4 beats
 		"""
 		curr_dur = sum([note.get_duration() for note in self.solution])
 		while curr_dur != 4:
 			i = random.choice(range(len(self.solution)))
 			if curr_dur < 4:
 				self.solution[i].add_duration(.5)
-				curr_dur += .5
 			else:
+				if self.solution[i].get_duration() == .5:
+					continue
 				self.solution[i].add_duration(-.5)
-				curr_dur -= .5
+			curr_dur = sum([note.get_duration() for note in self.solution])
 		assert(sum([note.get_duration() for note in self.solution]) == 4)
 
 
 	def get_rhythms(self, sz):
 		"""
+		THIS FUNCTION IS DEPRECATED
 		post process rhythms by sampling sz notes from self.solution
 		"""
 		assert(0)  # deprecated
@@ -384,7 +377,9 @@ class search_solver:
 		intervalls larger than octaves, and "too many" consecutive large 
 		(third or larger) intervalls
 		"""
-		assert(len(solution) >= 2)
+		# assert(len(solution) >= 2)
+		if len(solution) < 2:
+			return 0
 
 		score = 0
 
@@ -433,11 +428,11 @@ class search_solver:
 		# incentivize a downward or upward line
 		pitch_diff = sum(intervals)
 		if pitch_diff > 12:
-			score += 6
+			score += 2
 		elif pitch_diff > 7:
-			score += 5
+			score += 2
 		elif pitch_diff > 3:
-			score += 4
+			score += 1
 		return score
 
 
@@ -448,8 +443,7 @@ class search_solver:
 		score = 0
 		for note in solution:
 			if note.get_pitch() not in theory.register:
-				score -= 5
-		# print "register score of:", score
+				score -= 100
 		return score
 
 
