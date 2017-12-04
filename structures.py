@@ -21,8 +21,17 @@ class Note:
 		self.duration = duration
 		self.volume = std_volume
 
+	def get_pitch(self):
+		return self.pitch
+
+	def get_duration(self):
+		return self.duration
+
 	def set_duration(self, duration):
 		self.duration = duration
+
+	def set_pitch(self, pitch):
+		self.pitch = pitch
 
 	def transpose(self, steps, up=True):
 		if up:
@@ -34,16 +43,16 @@ class Note:
 		return self.pitch
 
 	def as_letter(self):
-		return self.pitches[self.pitch%12]
+		if self.is_rest():
+			return "Rest"
+		else:
+			return self.pitches[self.pitch%12]
 
 	def is_rest(self):
 		return self.pitch == 0
 
 	def __str__ (self):
 		return self.as_letter() + ": " + str(self.duration)
-
-	def get_pitch(self):
-		return self.pitch
 
 class Chord:
 	"""

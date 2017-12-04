@@ -50,7 +50,7 @@ class search_solver:
 		requirements of the subproblem and can be subjected to 
 		the feature evaluation functions
 		"""
-		return self.GA()
+		return self.search()
 
 	def get_resolution(self):
 		"""
@@ -82,7 +82,34 @@ class search_solver:
 		"""
 		post process rhythms by sampling sz notes from self.solution
 		"""
-		pass
+		assert(self.solution)
+		sol = copy.copy(self.solution)
+		assert(sz < len(sol))
+
+		if not self.fixed_notes:
+			self.fixed_notes = {}
+		new_notes = []
+
+		# sample notes to keep
+		for _ in range(sz):
+			i = random.choice(range(len(sol)))
+			while (i in self.fixed_notes or i in new_notes):
+				i = random.choice(range(len(sol)))
+			new_notes.append(i)
+
+		# nonsampled notes are turned into rests
+		last_note = None
+		for i in range(len(sol)):
+			if i in new_notes:
+				last_note = sol[i]
+			elif last_note:
+				last_note.set_duration(last_note.get_duration() + .5)
+				sol[i].set_duration(0)
+			else:
+				sol[i].set_pitch(0)
+
+		return [note for note in sol if note.get_duration() != 0]
+
 
 	def get_sample_G7_solution1(self):
 		return util.make_notes([86, 84, 81, 82, 83, 81, 79, 78])
@@ -156,7 +183,7 @@ class search_solver:
 		# sample a single note
 		i = random.choice(range(len(soln)))
 		if self.fixed_notes:
-			while (i in self.fixed_notes):
+			while (i in self.fixed_notes or soln[i].is_rest()):
 				i = random.choice(range(len(soln)))
 
 		# sample notes to replace this note
@@ -294,11 +321,11 @@ class search_solver:
 			tension = None
 			letter = note.as_letter()
 			if chord.is_third_or_seventh(letter):
-				score += 6
+				score += 3
 			elif chord.is_chord_tone(letter):
-				score += 5
+				score += 2
 			elif chord.is_in_scale(letter):
-				score += 4
+				score += 1
 			elif chord.is_tension(letter):
 				tension = letter
 		return score

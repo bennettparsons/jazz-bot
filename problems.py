@@ -2,6 +2,7 @@
 
 import util
 from search import subproblem, search_solver
+import random
 
 class problem:
 	"""
@@ -32,20 +33,24 @@ class problem:
 		create a solo over the progression; dynamically add constraints to
 		subproblems based on solutions just created
 		"""
+		sz = 4    # used in get_rhythms
 		solo = []
 		sub_sol = None
 		fixed_notes = None
 		if self.alg == "search":
 			for subp in self.subproblems:
+				sz = random.choice([n+4 for n in range(5)])
 				# setup problem constraints
-				subp.set_init_sol(sub_sol)
+				# subp.set_init_sol(sub_sol)
 				subp.set_fixed_notes(fixed_notes)
 
 				# solve
 				solver = search_solver(subp)
 				sub_sol = solver.get_solution()
-				solo += sub_sol
 				fixed_notes = {0: solver.get_resolution()}
+				if sz < 8:
+					sub_sol = solver.get_rhythms(sz)  # try out rhythms
+				solo += sub_sol
 		final_note = fixed_notes[0]
 		final_note.set_duration(4)
 		return solo + [final_note]
@@ -60,6 +65,9 @@ if __name__ == "__main__":
 	# res.set_duration(4)
 	# print "res is definitely", res
 	# util.write_midi(solo=solo + [res], chords=progression)
+	# solo = get_rhythms(solo, 4)
+	# util.write_midi(solo=solo + [res], chords=progression, outfile="rhythms.mid")
+
 
 	numerals = [('I','7')]*4 + [('IV','7')]*2 + [('I','7')]*2 + [('V','7'), ('IV','7'), ('I','7'), ('V','7')]
 	progression = util.build_progression('C', numerals + [('I', '7')])
