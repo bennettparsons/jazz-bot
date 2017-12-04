@@ -12,8 +12,8 @@ class problem:
 		heuristics to come later!) and stitches them together smoothly
 	"""
 
-	def __init__  (self, progression, alg="search"):
-		self.chords = progression
+	def __init__  (self, progression, alg="search", res_chord=[], choruses=1):
+		self.chords = progression*choruses + [res_chord]
 		self.alg = "search"
 		self.define_subproblems()
 
@@ -71,5 +71,9 @@ if __name__ == "__main__":
 
 
 	numerals = [('I','7')]*4 + [('IV','7')]*2 + [('I','7')]*2 + [('V','7'), ('IV','7'), ('I','7'), ('V','7')]
-	progression = util.build_progression('C', numerals + [('I', '7')])
-	util.write_midi(solo=problem(progression).get_solo(), chords=progression)
+	progression = util.build_progression('C', numerals)
+	util.write_midi(solo=problem(progression, choruses=2, res_chord=util.build_chord('C', 'I', '7')).get_solo(), chords=progression*2 + [util.build_chord('C', 'I', '7')])
+
+
+
+
