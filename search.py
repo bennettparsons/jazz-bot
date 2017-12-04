@@ -14,12 +14,21 @@ class subproblem:
 	now we keep it to just the current chord
 	"""
 
-	def __init__ (self, chord, init_sol=None, fixed_notes=None, res_chord=None):
+	def __init__ (self, chord, init_sol=None, fixed_notes=None, res_chord=None, size=8):
 		self.chord = chord
+		# init_sol must have length of size
+		if init_sol:
+			print "something"
+			while len(init_sol) != size:
+				if len(init_sol) < size:
+					init_sol.append(init_sol[-1])
+				else:
+					del init_sol[random.choice(range(len(init_sol)))]
 		self.init_sol = init_sol
 		self.fixed_notes = fixed_notes
 		self.res_chord = res_chord
 		self.solution = None
+		self.size = size
 
 	def set_fixed_notes(self, fixed_notes):
 		self.fixed_notes = fixed_notes
@@ -43,6 +52,7 @@ class search_solver:
 		self.res_chord = subproblem.res_chord
 		self.solution = None
 		self.active_chord = self.chord
+		self.size = subproblem.size
 
 	def get_solution(self):
 		"""
@@ -50,7 +60,12 @@ class search_solver:
 		requirements of the subproblem and can be subjected to 
 		the feature evaluation functions
 		"""
-		return self.search()
+		self.search()
+		self.rhythms()
+		# verify invariants
+		assert(sum([note.get_duration() for note in self.solution]) == 4)
+		assert(len(self.solution) == self.size)
+		return self.solution
 
 	def get_resolution(self):
 		"""
@@ -78,10 +93,26 @@ class search_solver:
 		return max(sols)[1]
 
 
+	def rhythms(self):
+		"""
+		make it be a real measure
+		"""
+		curr_dur = sum([note.get_duration() for note in self.solution])
+		while curr_dur != 4:
+			i = random.choice(range(len(self.solution)))
+			if curr_dur < 4:
+				self.solution[i].add_duration(.5)
+				curr_dur += .5
+			else:
+				self.solution[i].add_duration(-.5)
+				curr_dur -= .5
+
+
 	def get_rhythms(self, sz):
 		"""
 		post process rhythms by sampling sz notes from self.solution
 		"""
+		assert(0)  # deprecated
 		assert(self.solution)
 		sol = copy.copy(self.solution)
 		assert(sz < len(sol))
@@ -103,7 +134,7 @@ class search_solver:
 			if i in new_notes:
 				last_note = sol[i]
 			elif last_note:
-				last_note.set_duration(last_note.get_duration() + .5)
+				last_note.add_duration(.5)
 				sol[i].set_duration(0)
 			else:
 				sol[i].set_pitch(0)
@@ -133,14 +164,17 @@ class search_solver:
 
 			TO DO - add a scheduling / temperature function
 		"""
-		# initialize
+		# initialize: make a solution of size self.size
 		if self.init_sol:
+			assert(len(self.init_sol) == self.size)
 			curr_soln = self.init_sol
 		else:
-			curr_soln = util.make_notes([self.chord.get_root().get_pitch() + 24] * 8) # TBU
+			curr_soln = util.make_notes([self.chord.get_root().get_pitch() + 24] * self.size)
 		if self.fixed_notes:
 			for i in self.fixed_notes:
 				curr_soln[i] = self.fixed_notes[i]
+
+		assert(len(curr_soln) == self.size)
 		best_soln = curr_soln
 
 		n = 200
@@ -168,9 +202,8 @@ class search_solver:
 				best_soln = curr_soln
 				best_soln_val = curr_soln_val
 
-		print "Score of:", best_soln_val
+		print "Score of:", best_soln_val, "for", self.size, "notes"
 		self.solution = best_soln
-		return best_soln
 
 
 	def get_neighbor_node(self, soln, pitch_sd=3):
@@ -242,7 +275,6 @@ class search_solver:
 		best_sol = sorted(population, key=lambda individual: self.get_fitness(individual), reverse=True)[0]
 		print "Score of:", self.get_fitness(best_sol)
 		self.solution = best_sol
-		return best_sol
 
 	def generate_individual_for_population(self):
 		"""
@@ -341,6 +373,8 @@ class search_solver:
 		intervalls larger than octaves, and "too many" consecutive large 
 		(third or larger) intervalls
 		"""
+		assert(len(solution) >= 2)
+
 		score = 0
 
 		# heuristics
@@ -357,7 +391,7 @@ class search_solver:
 		directions = []   # recent interval direction (up or down)
 
 		# build intervals and directions from solution
-		for i in [n+1 for n in range(7)]:
+		for i in [n+1 for n in range(len(solution) - 1)]:
 			intervals.append(sol[i] - sol[i-1])
 			if sol[i] < sol[i-1]:
 				directions.append(down)
@@ -369,8 +403,9 @@ class search_solver:
 		abs_intervals = [abs(n) for n in intervals]
 
 		# incentivize varied contour and intervalls
-		score += interval_variety[len(util.compress(abs_intervals))]
-		score += direction_variety[len(util.compress(directions))]
+		if len(solution) >= 5:
+			score += interval_variety[len(util.compress(abs_intervals))]
+			score += direction_variety[len(util.compress(directions))]
 
 		# slight penalization for repeating notes
 		if directions.count(same) > 2:
@@ -387,11 +422,11 @@ class search_solver:
 		# incentivize a downward or upward line
 		pitch_diff = sum(intervals)
 		if pitch_diff > 12:
-			score += 3
+			score += 6
 		elif pitch_diff > 7:
-			score += 2
+			score += 5
 		elif pitch_diff > 3:
-			score += 1
+			score += 4
 		return score
 
 

@@ -2,7 +2,7 @@
 
 import util
 from search import subproblem, search_solver
-import random
+import random, copy
 
 class problem:
 	"""
@@ -24,7 +24,8 @@ class problem:
 		subps = []
 		curr_chord = self.chords[0]
 		for res_chord in self.chords[1:]:
-			subps.append(subproblem(curr_chord, res_chord=res_chord))
+			sz = random.choice([n+2 for n in range(6)])
+			subps.append(subproblem(curr_chord, res_chord=res_chord, size=sz))
 			curr_chord = res_chord
 		self.subproblems = subps
 
@@ -39,17 +40,14 @@ class problem:
 		fixed_notes = None
 		if self.alg == "search":
 			for subp in self.subproblems:
-				sz = random.choice([n+4 for n in range(5)])
 				# setup problem constraints
-				# subp.set_init_sol(sub_sol)
-				subp.set_fixed_notes(fixed_notes)
+				subp.set_init_sol(copy.copy(sub_sol))
+				# subp.set_fixed_notes(fixed_notes)
 
 				# solve
 				solver = search_solver(subp)
 				sub_sol = solver.get_solution()
 				fixed_notes = {0: solver.get_resolution()}
-				if sz < 8:
-					sub_sol = solver.get_rhythms(sz)  # try out rhythms
 				solo += sub_sol
 		final_note = fixed_notes[0]
 		final_note.set_duration(4)

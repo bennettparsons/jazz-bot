@@ -30,6 +30,9 @@ class Note:
 	def set_duration(self, duration):
 		self.duration = duration
 
+	def add_duration(self, duration):
+		self.duration += duration
+
 	def set_pitch(self, pitch):
 		self.pitch = pitch
 
