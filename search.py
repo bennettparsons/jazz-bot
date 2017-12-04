@@ -60,6 +60,7 @@ class search_solver:
 			the feature evaluation functions
 		"""
 		self.search()
+		# assert(self.solution)
 		self.rhythms()
 		# verify invariants
 		assert(sum([note.get_duration() for note in self.solution]) == 4)
@@ -108,7 +109,6 @@ class search_solver:
 					continue
 				self.solution[i].add_duration(-.5)
 			curr_dur = sum([note.get_duration() for note in self.solution])
-		assert(sum([note.get_duration() for note in self.solution]) == 4)
 
 
 	def get_rhythms(self, sz):
@@ -174,9 +174,18 @@ class search_solver:
 			curr_soln = self.init_sol
 		else:
 			curr_soln = util.make_notes([self.chord.get_root().get_pitch() + 24] * self.size)
+		assert(curr_soln)
+		# fix certain notes
 		if self.fixed_notes:
+			assert(len(self.fixed_notes) <= self.size)
 			for i in self.fixed_notes:
 				curr_soln[i] = self.fixed_notes[i]
+			# solution may be predetermined
+			if len(self.fixed_notes) == self.size:
+				# print "hi!"
+				# util.print_notes(curr_soln)
+				self.solution = curr_soln
+				return
 
 		assert(len(curr_soln) == self.size)
 		best_soln = curr_soln
@@ -208,6 +217,7 @@ class search_solver:
 
 		print "Score of:", best_soln_val, "for", self.size, "notes"
 		self.solution = best_soln
+		return
 
 
 	def get_neighbor_node(self, soln, pitch_sd=3):
@@ -426,7 +436,7 @@ class search_solver:
 		score += np.dot([abs_intervals.count(i+1) for i in range(12)], params["interval_weights"])
 
 		# slight penalization for repeating notes
-		score += params["same"][directions.count(same)]
+		score += params["same"][directions.count(same)-1]
 
 		# disincentivize leaps larger than an octave
 		for interval in abs_intervals:

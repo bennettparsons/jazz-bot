@@ -6,6 +6,11 @@ from midiutil import MIDIFile
 from midiutil.MidiFile import *
 
 
+def print_notes(notes):
+	assert(notes)
+	for note in notes:
+		print note
+
 def interval(n1, n2):
 	return n2.as_pitch() - n1.as_pitch()
 
