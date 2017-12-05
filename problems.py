@@ -37,12 +37,15 @@ class problem:
 		self.subproblems = subps
 
 	def get_problem_size(self):
+		"""
+		number of notes per measure is a gaussian whose mean and standard 
+		deviationsis are linearly increasing and decreasing functions,
+		respectively, of the current chorus
+		"""
 		mean = 8.0 / self.choruses * self.chorus
-		if self.chorus == self.choruses:
-			mean = 8
-			sd = 1
-		sd = 2
+		sd = 3.0 / self.choruses * (self.choruses - self.chorus + 1)
 		sz = int(random.gauss(mean, sd))
+		# print (mean, sd), sz
 		while sz < 1 or sz > 8:
 			sz = int(random.gauss(mean, sd))
 		return sz
@@ -90,7 +93,7 @@ if __name__ == "__main__":
 
 	numerals = [('I','7')]*4 + [('IV','7')]*2 + [('I','7')]*2 + [('V','7'), ('IV','7'), ('I','7'), ('V','7')]
 	progression = util.build_progression('C', numerals)
-	num_choruses = 1
+	num_choruses = 4
 	util.write_midi(solo=problem(progression, choruses=num_choruses, res_chord=util.build_chord('C', 'I', '7')).get_solo(),
 					chords=progression*num_choruses + [util.build_chord('C', 'I', '7')])
 
