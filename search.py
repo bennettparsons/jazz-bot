@@ -1,6 +1,6 @@
 # jazz-bot: search.py
 
-import random, copy
+import random, copy, math
 import util
 import theory
 from structures import Note
@@ -60,7 +60,6 @@ class search_solver:
 			the feature evaluation functions
 		"""
 		self.solution = self.search()
-		# assert(self.solution)
 		self.rhythms()
 		# verify invariants
 		assert(sum([note.get_duration() for note in self.solution]) == 4)
@@ -196,22 +195,24 @@ class search_solver:
 		curr_soln_val = 0
 		best_soln_val = curr_soln_val
 
-		for _ in range(n):
+		for i in range(n):
 
 			# get neighbor node
 			candidate_soln = self.get_neighbor_node(curr_soln)
 			candidate_soln_val = self.ensemble_evaluate(candidate_soln)
+			delta = candidate_soln_val - curr_soln_val
 
 			# accept with probability 1 if climbs up
-			if candidate_soln_val > curr_soln_val:
+			if delta > 0:
 				curr_soln = candidate_soln
 				curr_soln_val = candidate_soln_val
 
 			# accept with probability <1 if climbs down
 			# should be proportional to size of change but not sure what distance metric makes sense rn
-			elif random.random() < 0.1:
+			elif random.random() < self.cooling(delta, i):
 				curr_soln = candidate_soln
 				curr_soln_val = candidate_soln_val
+
 
 			if best_soln_val < curr_soln_val:
 				best_soln = curr_soln
@@ -220,6 +221,8 @@ class search_solver:
 		print "Score of:", best_soln_val, "for", self.size, "notes"
 		return best_soln
 
+	def cooling(self, delta, i):
+		return math.exp(delta / ((10 * pow(0.8, i // 30))))
 
 	def get_neighbor_node(self, soln, pitch_sd=3):
 		"""
