@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
 	numerals = [('I','7')]*4 + [('IV','7')]*2 + [('I','7')]*2 + [('V','7'), ('IV','7'), ('I','7'), ('V','7')]
 	progression = util.build_progression('C', numerals)
-	num_choruses = 4
+	num_choruses = 2
 	util.write_midi(solo=problem(progression, choruses=num_choruses, res_chord=util.build_chord('C', 'I', '7')).get_solo(),
 					chords=progression*num_choruses + [util.build_chord('C', 'I', '7')])
 

@@ -59,7 +59,7 @@ class search_solver:
 			requirements of the subproblem and can be subjected to 
 			the feature evaluation functions
 		"""
-		self.solution = self.search()
+		self.solution = self.GA()
 		self.rhythms()
 		# verify invariants
 		assert(sum([note.get_duration() for note in self.solution]) == 4)
@@ -296,8 +296,8 @@ class search_solver:
 
 		# return the fittest individual
 		best_sol = sorted(population, key=lambda individual: self.get_fitness(individual), reverse=True)[0]
-		print "Score of:", self.get_fitness(best_sol)
-		self.solution = best_sol
+		print "Score of:", self.get_fitness(best_sol), "for", self.size, "notes"
+		return best_sol
 
 	def generate_individual_for_population(self):
 		"""
@@ -352,6 +352,8 @@ class search_solver:
 			if random.random() < 0.05:
 				pitch = note.as_pitch()
 				new_pitch = int(random.gauss(pitch, 3))  # \sigma = 3 1/2 steps, again
+				while new_pitch not in theory.register:
+					new_pitch = int(random.gauss(pitch, 3))
 				mutated_child[note_index] = util.make_notes([new_pitch])[0]
 		return mutated_child
 
