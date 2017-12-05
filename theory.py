@@ -36,8 +36,9 @@ seventh = [10,11]
 
 large_leap = [n+13 for n in range(50)]
 
-# play notes from this range for solo
-register = [n+56 for n in range(45)]
+# play notes from this range for solo (soprano saxophone range)
+register = [n+56 for n in range(34)]
+
 
 ######################################
 # Feature Evaluation Function Params #

@@ -2,9 +2,36 @@
 
 from structures import Note, Chord
 import theory
+import random
 from midiutil import MIDIFile
 from midiutil.MidiFile import *
 
+
+def assert_register(notes):
+	"""
+		assert that each note is within the pitch range
+		specified by theory.register
+	"""
+	for note in notes:
+		assert(note.as_pitch() in theory.register)
+
+def weighted_choice(lst):
+	"""
+		return index from lst according to weighted distribution
+		of it's elements, which must be real numbers
+		e.g. for lst = [1,4,5], weighted_choice(lst) returns:
+		0 with probability 1/10
+		1 with probability 2/5
+		2 with probability 1/2 
+	"""
+	s = sum(lst)
+	r = random.uniform(0,s)
+	psum = 0
+	for i in range(len(lst)):
+		psum += lst[i]
+		if r < psum:
+			return i
+	assert(0)  # must have returned before now
 
 def print_notes(notes):
 	assert(notes)
@@ -12,6 +39,9 @@ def print_notes(notes):
 		print note
 
 def interval(n1, n2):
+	"""
+		get interval between two pitches
+	"""
 	return n2.as_pitch() - n1.as_pitch()
 
 def compress(lst):

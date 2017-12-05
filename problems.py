@@ -1,6 +1,6 @@
 # jazz-bot: problems.py
 
-import util
+import util, theory
 from search import subproblem, search_solver
 import random, copy
 
@@ -15,6 +15,8 @@ class problem:
 	def __init__  (self, progression, alg="search", res_chord=[], choruses=1):
 		self.chords = progression*choruses + [res_chord]
 		self.alg = "search"
+		self.choruses = choruses
+		self.chorus = 1
 		self.define_subproblems()
 
 	def define_subproblems(self):
@@ -22,12 +24,28 @@ class problem:
 			setup suproblems that are solved sequentially by get_solo
 		"""
 		subps = []
+		bar = 1
 		curr_chord = self.chords[0]
 		for res_chord in self.chords[1:]:
-			sz = random.choice([n+6 for n in range(3)])
+			if bar == 13:
+				self.chorus += 1
+				bar = 0
+			sz = self.get_problem_size()
 			subps.append(subproblem(curr_chord, res_chord=res_chord, size=sz))
 			curr_chord = res_chord
+			bar += 1
 		self.subproblems = subps
+
+	def get_problem_size(self):
+		mean = 8.0 / self.choruses * self.chorus
+		if self.chorus == self.choruses:
+			mean = 8
+			sd = 1
+		sd = 2
+		sz = int(random.gauss(mean, sd))
+		while sz < 1 or sz > 8:
+			sz = int(random.gauss(mean, sd))
+		return sz
 
 	def get_solo(self):
 		"""
@@ -49,11 +67,11 @@ class problem:
 				# solve
 				solver = search_solver(subp)
 				sub_sol = solver.get_solution()
-				assert(sum([note.get_duration() for note in sub_sol]) == 4)
 				fixed_notes = {0: solver.get_resolution()}
 				solo += sub_sol
 		final_note = fixed_notes[0]
 		final_note.set_duration(4)
+		util.assert_register(solo)
 		return solo + [final_note]
 
 if __name__ == "__main__":
@@ -72,8 +90,9 @@ if __name__ == "__main__":
 
 	numerals = [('I','7')]*4 + [('IV','7')]*2 + [('I','7')]*2 + [('V','7'), ('IV','7'), ('I','7'), ('V','7')]
 	progression = util.build_progression('C', numerals)
-	num_choruses = 4
-	util.write_midi(solo=problem(progression, choruses=num_choruses, res_chord=util.build_chord('C', 'I', '7')).get_solo(), chords=progression*num_choruses + [util.build_chord('C', 'I', '7')])
+	num_choruses = 1
+	util.write_midi(solo=problem(progression, choruses=num_choruses, res_chord=util.build_chord('C', 'I', '7')).get_solo(),
+					chords=progression*num_choruses + [util.build_chord('C', 'I', '7')])
 
 
 

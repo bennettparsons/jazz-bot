@@ -21,9 +21,6 @@ class Note:
 		self.duration = duration
 		self.volume = std_volume
 
-	def get_pitch(self):
-		return self.pitch
-
 	def get_duration(self):
 		return self.duration
 

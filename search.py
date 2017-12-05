@@ -59,7 +59,7 @@ class search_solver:
 			requirements of the subproblem and can be subjected to 
 			the feature evaluation functions
 		"""
-		self.GA()
+		self.solution = self.search()
 		# assert(self.solution)
 		self.rhythms()
 		# verify invariants
@@ -67,6 +67,7 @@ class search_solver:
 		assert(len(self.solution) == self.size)
 		for note in self.solution:
 			assert(note.get_duration() != 0)
+		util.assert_register(self.solution)
 		return self.solution
 
 	def get_resolution(self):
@@ -77,6 +78,7 @@ class search_solver:
 		"""
 		assert(self.solution)
 		self.active_chord = self.res_chord
+		self.size = 2
 		prev_note = self.solution[-1]
 		proposed_soln = copy.copy(prev_note)
 		proposed_soln.transpose(7, up=False)
@@ -92,7 +94,12 @@ class search_solver:
 		# print
 		# print "Best sol is:", max(sols), max(sols)[0], max(sols)[1].as_letter()
 
-		return max(sols)[1]
+		weights = [s[0]*10 for s in sols]
+		res_idx = util.weighted_choice(weights)
+		while sols[res_idx][1].as_pitch() not in theory.register:
+			res_idx = util.weighted_choice(weights)
+
+		return sols[res_idx][1]
 
 
 	def rhythms(self):
@@ -116,7 +123,6 @@ class search_solver:
 			THIS FUNCTION IS DEPRECATED
 			post process rhythms by sampling sz notes from self.solution
 		"""
-		assert(0)  # deprecated
 		assert(self.solution)
 		sol = copy.copy(self.solution)
 		assert(sz < len(sol))
@@ -173,8 +179,7 @@ class search_solver:
 			assert(len(self.init_sol) == self.size)
 			curr_soln = self.init_sol
 		else:
-			curr_soln = util.make_notes([self.chord.get_root().get_pitch() + 24] * self.size)
-		assert(curr_soln)
+			curr_soln = util.make_notes([random.choice(theory.register) for _ in range(self.size)])
 		# fix certain notes
 		if self.fixed_notes:
 			assert(len(self.fixed_notes) <= self.size)
@@ -182,10 +187,7 @@ class search_solver:
 				curr_soln[i] = self.fixed_notes[i]
 			# solution may be predetermined
 			if len(self.fixed_notes) == self.size:
-				# print "hi!"
-				# util.print_notes(curr_soln)
-				self.solution = curr_soln
-				return
+				return curr_soln
 
 		assert(len(curr_soln) == self.size)
 		best_soln = curr_soln
@@ -216,8 +218,7 @@ class search_solver:
 				best_soln_val = curr_soln_val
 
 		print "Score of:", best_soln_val, "for", self.size, "notes"
-		self.solution = best_soln
-		return
+		return best_soln
 
 
 	def get_neighbor_node(self, soln, pitch_sd=3):
@@ -227,17 +228,19 @@ class search_solver:
 			1 s.d. corresponds to 3 half-steps ? we can tweak however
 		"""
 
-		# sample a single note
+		# sample a single note (can't be a fixed note)
 		i = random.choice(range(len(soln)))
 		if self.fixed_notes:
 			while (i in self.fixed_notes or soln[i].is_rest()):
 				i = random.choice(range(len(soln)))
 
-		# sample notes to replace this note
-		pitch = soln[i].get_pitch()
+		# sample notes to replace this note (must be in theory.register)
+		pitch = soln[i].as_pitch()
 		proposed_pitch = int(random.gauss(pitch, pitch_sd))
+		while proposed_pitch not in theory.register:
+			proposed_pitch = int(random.gauss(pitch, pitch_sd))
 
-		# python is pass by ref right?
+		# create new solution with altered pitch
 		proposed_soln = copy.copy(soln)
 		proposed_soln[i] = Note(proposed_pitch, duration=.5)
 		return proposed_soln
@@ -268,7 +271,7 @@ class search_solver:
 				# selection time
 				# 	sample parents with probability that's proportional to fitness
 				fitness = [self.get_fitness(individual) 
-							if self.get_fitness(individual) > 0 else 0 # fitness function can be <0 e.g. for bad register scoring
+							if self.get_fitness(individual) > 0 else 0 # fitness function can be <0
 							for individual in population]
 
 				normalized_fitness = map(lambda x: x / float(sum(fitness)), fitness)
@@ -302,7 +305,7 @@ class search_solver:
 			assert(len(self.init_sol) == self.size)
 			pitches = copy.copy(self.init_sol)
 		else:
-			pitches = util.make_notes([self.chord.get_root().get_pitch() + 24] * self.size)
+			pitches = util.make_notes([random.choice(theory.register) for _ in range(self.size)])
 		
 		if self.fixed_notes:
 			for i in self.fixed_notes:
@@ -312,7 +315,7 @@ class search_solver:
 		
 
 		# pitch_sd = 3 # \sigma = 3 1/2 steps
-		# pitches = [self.chord.get_root().get_pitch()+24] * 8
+		# pitches = [self.chord.get_root().as_pitch()+24] * 8
 		# pitches = map(lambda pitch: int(random.gauss(pitch, pitch_sd)), pitches)
 		# return util.make_notes(pitches)
 
@@ -344,7 +347,7 @@ class search_solver:
 				if note_index in self.fixed_notes:
 					continue
 			if random.random() < 0.05:
-				pitch = note.get_pitch()
+				pitch = note.as_pitch()
 				new_pitch = int(random.gauss(pitch, 3))  # \sigma = 3 1/2 steps, again
 				mutated_child[note_index] = util.make_notes([new_pitch])[0]
 		return mutated_child
@@ -355,19 +358,19 @@ class search_solver:
 
 	def get_params(self, funcs):
 		"""
-		returns subproblem specific parameters for feature evaluation
-		functions funcs; for now, just a function of the solution size
+			returns subproblem specific parameters for feature evaluation
+			functions funcs; for now, just a function of the solution size
 		"""
 		return [theory.params[func][self.size-1] for func in funcs]
 
 
 	def ensemble_evaluate(self, soln):
 		"""
-			evaluate on tonality, contour and register
+			evaluate on tonality and contour
 
 		"""
 		params = self.get_params(("tonality", "contour"))
-		return self.tonality(soln, params[0]) + self.contour(soln, params[1]) + self.register(soln)
+		return self.tonality(soln, params[0]) + self.contour(soln, params[1]) # + self.register(soln)
 
 
 	def resolution_evaluate(self, prev_note, res_note):
@@ -409,14 +412,13 @@ class search_solver:
 
 	def contour(self, solution, params):
 		"""
-		how well does the solo use contour? This includes an evaluation
-		of intervallic diversity: *in general* we want a good mix of half
-		steps and whole steps, along with larger leaps of 3rds-octaves. When
-		considering just a stream of eighth notes (a bebop line), we penalize
-		intervalls larger than octaves, and "too many" consecutive large 
-		(third or larger) intervalls
+			how well does the solo use contour? This includes an evaluation
+			of intervallic diversity: *in general* we want a good mix of half
+			steps and whole steps, along with larger leaps of 3rds-octaves. When
+			considering just a stream of eighth notes (a bebop line), we penalize
+			intervalls larger than octaves, and "too many" consecutive large 
+			(third or larger) intervalls
 		"""
-		# assert(len(solution) >= 2)
 		if len(solution) < 2:
 			return 0
 
@@ -476,20 +478,21 @@ class search_solver:
 
 	def register(self, solution):
 		"""
-		penalities notes outside the desired register
+			DEPRECATED
+			penalizes notes outside the desired register
 		"""
 		score = 0
 		for note in solution:
-			if note.get_pitch() not in theory.register:
+			if note.as_pitch() not in theory.register:
 				score -= 100
 		return score
 
 
 	def distance(self, solution, params):
 		"""
-		very simple distance function for evaluation scoring. Simply
-		encourages smaller steps over larger ones. Can be used for
-		finding a very simple resolution pitch for a solution
+			very simple distance function for evaluation scoring. Simply
+			encourages smaller steps over larger ones. Can be used for
+			finding a very simple resolution pitch for a solution
 		"""
 		score = 0
 		assert(len(solution) >= 2)
