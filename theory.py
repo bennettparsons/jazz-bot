@@ -1,5 +1,9 @@
 # jazz-bot.py: music_theory.py
 
+"""
+	Our representation of jazz music theory rules
+"""
+
 keys = {'A':45, 'Bb':46, 'B':47, 'C':48, 'Db':49, 'D':50,
  		'Eb':51, 'E':52, 'F':53, 'Gb':54, 'G':55, 'Ab':56}
 
@@ -45,7 +49,7 @@ register = [n+56 for n in range(34)]
 ######################################
 
 
-# indexed by solution size
+# indexed by feature evaluator, then solution size
 params = {
 "tonality":
 	[

@@ -28,8 +28,6 @@ class subproblem:
 	def set_init_sol(self, init_sol):
 		self.init_sol = init_sol
 
-	# more stuff?
-
 
 class search_solver:
 	"""
@@ -87,16 +85,10 @@ class search_solver:
 		proposed_soln = copy.copy(prev_note)
 		proposed_soln.transpose(7, up=False)
 		sols = []
-		# print prev_note
-		# print
 		while(abs(util.interval(proposed_soln, prev_note)) <= 8):
 			sols.append((self.resolution_evaluate(prev_note, proposed_soln), proposed_soln))
-			# print "Score of:", sols[-1][0], "for note", sols[-1][1]
 			proposed_soln = copy.copy(proposed_soln)
 			proposed_soln.transpose(1)
-
-		# print
-		# print "Best sol is:", max(sols), max(sols)[0], max(sols)[1].as_letter()
 
 		weights = [s[0]*10 for s in sols]
 		res_idx = util.weighted_choice(weights)
@@ -122,47 +114,17 @@ class search_solver:
 			curr_dur = sum([note.get_duration() for note in self.solution])
 
 
-	def get_rhythms(self, sz):
-		"""
-			THIS FUNCTION IS DEPRECATED
-			post process rhythms by sampling sz notes from self.solution
-		"""
-		assert(self.solution)
-		sol = copy.copy(self.solution)
-		assert(sz < len(sol))
-
-		if not self.fixed_notes:
-			self.fixed_notes = {}
-		new_notes = []
-
-		# sample notes to keep
-		for _ in range(sz):
-			i = random.choice(range(len(sol)))
-			while (i in self.fixed_notes or i in new_notes):
-				i = random.choice(range(len(sol)))
-			new_notes.append(i)
-
-		# nonsampled notes are turned into rests
-		last_note = None
-		for i in range(len(sol)):
-			if i in new_notes:
-				last_note = sol[i]
-			elif last_note:
-				last_note.add_duration(.5)
-				sol[i].set_duration(0)
-			else:
-				sol[i].set_pitch(0)
-
-		return [note for note in sol if note.get_duration() != 0]
-
-
 	def get_sample_G7_solution1(self):
+		"""
+			a sample solution fitting a G7 chord
+		"""
 		return util.make_notes([86, 84, 81, 82, 83, 81, 79, 78])
 
 	def get_sample_G7_solution2(self):
+		"""
+			another sample solution for a G7 chord
+		"""
 		return util.make_notes([77, 81, 76, 79, 77, 69, 72, 74])
-
-
 
 
 
@@ -234,7 +196,6 @@ class search_solver:
 
 			1 s.d. corresponds to 3 half-steps ? we can tweak however
 		"""
-
 		# sample a single note (can't be a fixed note)
 		i = random.choice(range(len(soln)))
 		if self.fixed_notes:
@@ -252,6 +213,8 @@ class search_solver:
 		proposed_soln[i] = Note(proposed_pitch, duration=.5)
 		return proposed_soln
 
+
+
 	################################
 	# 		Genetic algorithms 	   #
 	################################
@@ -261,7 +224,6 @@ class search_solver:
 			a GA approach could be interesting b/c crossovers may 1. combine interesting licks / patterns
 			and 2. create interesting intervallic jumps / dives
 		"""
-		
 		# globals
 		generation_sz = 10
 		generations = 10
@@ -308,7 +270,6 @@ class search_solver:
 		"""
 			list of Notes
 		"""
-
 		if self.init_sol:
 			assert(len(self.init_sol) == self.size)
 			pitches = copy.copy(self.init_sol)
@@ -320,18 +281,11 @@ class search_solver:
 				pitches[i] = self.fixed_notes[i]
 
 		return pitches
-		
-
-		# pitch_sd = 3 # \sigma = 3 1/2 steps
-		# pitches = [self.chord.get_root().as_pitch()+24] * 8
-		# pitches = map(lambda pitch: int(random.gauss(pitch, pitch_sd)), pitches)
-		# return util.make_notes(pitches)
 
 	def generate_population(self, sz):
 		"""
 			list of list of Notes
 		"""
-
 		return [self.generate_individual_for_population() for _ in range(sz)]
 
 	def get_fitness(self, individual):
@@ -347,7 +301,7 @@ class search_solver:
 
 	def mutate(self, child):
 		"""
-		 	should add a temperature function here also
+		 	mutations occur at a random pitch location with small probability
 		"""
 		mutated_child = copy.copy(child)
 		for note_index, note in enumerate(mutated_child):
@@ -361,6 +315,8 @@ class search_solver:
 					new_pitch = int(random.gauss(pitch, 3))
 				mutated_child[note_index] = util.make_notes([new_pitch])[0]
 		return mutated_child
+
+
 
 	################################
 	# Feature Evaluation Functions #
@@ -419,11 +375,10 @@ class search_solver:
 		return score
 
 
-
 	def contour(self, solution, params):
 		"""
 			how well does the solo use contour? This includes an evaluation
-			of intervallic diversity: *in general* we want a good mix of half
+			of intervallic diversity: in general, we want a good mix of half
 			steps and whole steps, along with larger leaps of 3rds-octaves. When
 			considering just a stream of eighth notes (a bebop line), we penalize
 			intervalls larger than octaves, and "too many" consecutive large 
@@ -433,12 +388,6 @@ class search_solver:
 			return 0
 
 		score = 0
-
-		# heuristics: DEPRECATED by params
-		# interval_variety = {1:0, 2:0, 3:1, 4:3, 5:3, 6:2, 7:1, 8:1}
-		# direction_variety = {1:0, 2:2, 3:3, 4:3, 5:2, 6:1, 7:1, 8:1}
-		# interval_weights = [.5, .4, .3, .3, .3, .2, .2, .1]
-		# interval_weights = [1, .8, .6, .5, .3, .2, .1, 0, -.1, -.2, -.3, .2]
 
 		sol = util.make_pitches(solution)
 		up = "up"
@@ -459,7 +408,7 @@ class search_solver:
 
 		abs_intervals = [abs(n) for n in intervals]
 
-		# incentivize varied contour and intervalls
+		# incentivize varied contour and intervals
 		if len(solution) >= 5:
 			score += params["interval_variety"][len(util.compress(abs_intervals))]
 			score += params["direction_variety"][len(util.compress(directions))]
@@ -486,23 +435,11 @@ class search_solver:
 		return score
 
 
-	def register(self, solution):
-		"""
-			DEPRECATED
-			penalizes notes outside the desired register
-		"""
-		score = 0
-		for note in solution:
-			if note.as_pitch() not in theory.register:
-				score -= 100
-		return score
-
-
 	def distance(self, solution, params):
 		"""
 			very simple distance function for evaluation scoring. Simply
-			encourages smaller steps over larger ones. Can be used for
-			finding a very simple resolution pitch for a solution
+			encourages smaller steps over larger ones. Useful in
+			finding the resolution pitch for a solution
 		"""
 		score = 0
 		assert(len(solution) >= 2)

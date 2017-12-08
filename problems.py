@@ -38,14 +38,13 @@ class problem:
 
 	def get_problem_size(self):
 		"""
-		number of notes per measure is a gaussian whose mean and standard 
-		deviationsis are linearly increasing and decreasing functions,
-		respectively, of the current chorus
+			number of notes per measure is a gaussian whose mean and standard 
+			deviationsis are linearly increasing and decreasing functions,
+			respectively, of the current chorus
 		"""
 		mean = 8.0 / self.choruses * self.chorus
 		sd = 3.0 / self.choruses * (self.choruses - self.chorus + 1)
 		sz = int(random.gauss(mean, sd))
-		# print (mean, sd), sz
 		while sz < 1 or sz > 8:
 			sz = int(random.gauss(mean, sd))
 		return sz
@@ -77,27 +76,11 @@ class problem:
 		util.assert_register(solo)
 		return solo + [final_note]
 
+
 if __name__ == "__main__":
-	# numerals = [('V','7')]
-	# progression = util.build_progression('C', numerals + [('I', '7')])
-	# prob = problem(progression)
-	# solver = search_solver(prob.subproblems[0])
-	# solo = solver.get_solution()
-	# res = solver.get_resolution()
-	# res.set_duration(4)
-	# print "res is definitely", res
-	# util.write_midi(solo=solo + [res], chords=progression)
-	# solo = get_rhythms(solo, 4)
-	# util.write_midi(solo=solo + [res], chords=progression, outfile="rhythms.mid")
-
-
 	numerals = [('I','7')]*4 + [('IV','7')]*2 + [('I','7')]*2 + [('V','7'), ('IV','7'), ('I','7'), ('V','7')]
 	progression = util.build_progression('C', numerals)
 	num_choruses = 2
 
 	util.write_midi(solo=problem(progression, choruses=num_choruses, res_chord=util.build_chord('C', 'I', '7')).get_solo(),
 					chords=progression*num_choruses + [util.build_chord('D', 'I', '7')])
-
-
-
-

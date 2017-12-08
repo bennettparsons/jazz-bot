@@ -116,10 +116,9 @@ class Chord:
 	def __str__ (self):
 		return " ".join(self.as_letters()) + ": " + str(self.duration)
 
-	# other stuff...
-
 
 if __name__ == "__main__":
+	# unit tests
 	C = Note(48)
 	E = Note(52)
 	G = Note(55)
