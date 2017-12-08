@@ -46,5 +46,4 @@ if __name__ == '__main__':
 	progression = util.build_progression(key, prog_tuples)
 
 	util.write_midi(solo=problem(progression, alg=alg, choruses=n, res_chord=progression[0]).get_solo(),
-					# chords=progression*n + [util.build_chord('D', 'I', '7')])
 					chords=progression*n + [progression[0]], outfile=filename+'.mid')
