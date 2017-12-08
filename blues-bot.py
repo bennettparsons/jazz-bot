@@ -47,9 +47,9 @@ if __name__ == '__main__':
 	# build a blues solo, write it 
 	progression = util.build_progression(key, prog_tuples)
 
-	util.write_midi(solo=problem(progression, alg=alg, choruses=n, res_chord=util.build_chord(key, prog_tuples[0][0], prog_tuples[0][1])).get_solo(),
+	util.write_midi(solo=problem(progression, alg=alg, choruses=n, res_chord=progression[0]).get_solo(),
 					# chords=progression*n + [util.build_chord('D', 'I', '7')])
-					chords=progression*n, outfile=filename+'.mid')
+					chords=progression*n + [progression[0]], outfile=filename+'.mid')
 
 	
 
