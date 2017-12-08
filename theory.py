@@ -1,5 +1,3 @@
-# jazz-bot.py: music_theory.py
-
 """
 	Our representation of jazz music theory rules
 """

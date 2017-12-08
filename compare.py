@@ -18,9 +18,7 @@ def score(alg):
 		for result in results:
 			scores.append(float(result.split()[2]))
 			num_notes.append(int(result.split()[4]))
-
-		# print "Average score / note for " + alg + ":"
-		# print sum(scores) / sum(num_notes) # float / int 
+ 
 		return sum(scores) / sum(num_notes) # float / int  
 
 
