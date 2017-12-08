@@ -53,13 +53,18 @@ class search_solver:
 		self.solution = None
 		self.active_chord = self.chord
 
-	def get_solution(self):
+	def get_solution(self, alg):
 		"""
 			generate a solution: a sequence of notes that obeys the 
 			requirements of the subproblem and can be subjected to 
 			the feature evaluation functions
 		"""
-		self.solution = self.GA()
+
+		if alg == 'SA':
+			self.solution = self.search()
+		else:
+			self.solution = self.GA()
+
 		self.rhythms()
 		# verify invariants
 		assert(sum([note.get_duration() for note in self.solution]) == 4)
@@ -167,11 +172,10 @@ class search_solver:
 
 	def search(self):
 		"""
-			implements a simple search algorithm: hill-climbing with metropolis variation
+			implements a simulated annealing alg, i.e. hill-climbing with temperature-dependent 
+			metropolis variation
 
 			soln is a list of Note objects
-
-			TO DO - add a scheduling / temperature function
 		"""
 		# initialize: make a solution of size self.size
 		if self.init_sol:
@@ -257,6 +261,7 @@ class search_solver:
 			a GA approach could be interesting b/c crossovers may 1. combine interesting licks / patterns
 			and 2. create interesting intervallic jumps / dives
 		"""
+		
 		# globals
 		generation_sz = 10
 		generations = 10

@@ -12,9 +12,9 @@ class problem:
 		heuristics to come later!) and stitches them together smoothly
 	"""
 
-	def __init__  (self, progression, alg="search", res_chord=[], choruses=1):
+	def __init__  (self, progression, alg, res_chord=[], choruses=1):
 		self.chords = progression*choruses + [res_chord]
-		self.alg = "search"
+		self.alg = alg
 		self.choruses = choruses
 		self.chorus = 1
 		self.define_subproblems()
@@ -59,19 +59,19 @@ class problem:
 		solo = []
 		sub_sol = None
 		fixed_notes = None
-		if self.alg == "search":
-			for subp in self.subproblems:
-				# setup problem constraints
-				if sub_sol:
-					subp.set_init_sol(copy.deepcopy(sub_sol))
-				if fixed_notes:
-					subp.set_fixed_notes(fixed_notes)
+		
+		for subp in self.subproblems:
+			# setup problem constraints
+			if sub_sol:
+				subp.set_init_sol(copy.deepcopy(sub_sol))
+			if fixed_notes:
+				subp.set_fixed_notes(fixed_notes)
 
-				# solve
-				solver = search_solver(subp)
-				sub_sol = solver.get_solution()
-				fixed_notes = {0: solver.get_resolution()}
-				solo += sub_sol
+			# solve
+			solver = search_solver(subp)
+			sub_sol = solver.get_solution(self.alg)
+			fixed_notes = {0: solver.get_resolution()}
+			solo += sub_sol
 		final_note = fixed_notes[0]
 		final_note.set_duration(4)
 		util.assert_register(solo)
@@ -94,8 +94,9 @@ if __name__ == "__main__":
 	numerals = [('I','7')]*4 + [('IV','7')]*2 + [('I','7')]*2 + [('V','7'), ('IV','7'), ('I','7'), ('V','7')]
 	progression = util.build_progression('C', numerals)
 	num_choruses = 2
+
 	util.write_midi(solo=problem(progression, choruses=num_choruses, res_chord=util.build_chord('C', 'I', '7')).get_solo(),
-					chords=progression*num_choruses + [util.build_chord('C', 'I', '7')])
+					chords=progression*num_choruses + [util.build_chord('D', 'I', '7')])
 
 
 
