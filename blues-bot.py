@@ -19,7 +19,7 @@ def build_cli():
 						help='specify the key, like C or Db')
 	parser.add_argument('-p', '--progression', action='store', nargs='+', 
 						default="I 7 I 7 I 7 I 7 IV 7 IV 7 I 7 I 7 V 7 IV 7 I 7 V 7",
-						help='specify a sequence of numerals and qualities for the progression, separated by spaces')
+						help='specify a sequence of numerals and qualities for the progression, separated by spaces. NOTE: only 7 chords are currently supported')
 	parser.add_argument('-n', '--number_choruses', action='store', default='1', type=int,
 						help='specify the number of choruses to compose')
 	parser.add_argument('-f', '--filename', action='store', default='blues-bot-solo',
